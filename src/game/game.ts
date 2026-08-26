@@ -151,9 +151,10 @@ export class PinballGame {
     if (this.phase === "plunging" && this.ball) {
       if (input.plunge) {
         this.plunger = Math.min(1, this.plunger + dt * 1.35);
-      } else if (this.prevPlunge && this.plunger > 0.08) {
+      } else if (this.prevPlunge) {
+        if (this.plunger < 0.45) this.plunger = 0.62;
         this.launch();
-      } else if (!input.plunge) {
+      } else {
         this.plunger = Math.max(0, this.plunger - dt * 2.2);
       }
     }
