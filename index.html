@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#07061a" />
+    <title>ARC LIGHT — Pinball</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <div class="cabinet">
+        <header class="marquee">
+          <p class="eyebrow">Electric Pinball</p>
+          <h1>ARC LIGHT</h1>
+          <div class="hud">
+            <div class="hud-cell">
+              <span>Score</span>
+              <strong id="score">0000000</strong>
+            </div>
+            <div class="hud-cell">
+              <span>High</span>
+              <strong id="high">0000000</strong>
+            </div>
+            <div class="hud-cell">
+              <span>Ball</span>
+              <strong id="balls">3</strong>
+            </div>
+            <div class="hud-cell">
+              <span>Play</span>
+              <strong id="mult">1×</strong>
+            </div>
+          </div>
+        </header>
+
+        <div class="stage">
+          <canvas id="table" width="500" height="900" aria-label="Pinball table"></canvas>
+          <div id="overlay" class="overlay" data-mode="attract">
+            <div class="overlay-card">
+              <p class="overlay-kicker" id="overlay-kicker">Insert coin</p>
+              <h2 id="overlay-title">ARC LIGHT</h2>
+              <p class="overlay-body" id="overlay-body">
+                A neon table with flippers, pop bumpers, rollover lanes, and a
+                plunger lane. Hold to charge. Time the slap save.
+              </p>
+              <button type="button" id="start-btn" class="start-btn">
+                Press Start
+              </button>
+              <ul class="legend">
+                <li><kbd>Z</kbd> / <kbd>←</kbd> left flipper</li>
+                <li><kbd>X</kbd> / <kbd>→</kbd> right flipper</li>
+                <li><kbd>Space</kbd> hold to plunge</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <footer class="deck">
+          <p class="hint" id="hint">Hold Space in the launch lane, then flip to keep the ball alive.</p>
+          <div class="deck-row">
+            <button type="button" id="mute-btn" class="ghost-btn" aria-pressed="false">
+              Sound on
+            </button>
+            <p class="credit">3 balls · extra ball at 50,000</p>
+          </div>
+          <div class="touch-pad" aria-hidden="true">
+            <button type="button" id="touch-left" class="flip-btn">Left</button>
+            <button type="button" id="touch-plunge" class="plunge-btn">Plunge</button>
+            <button type="button" id="touch-right" class="flip-btn">Right</button>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
