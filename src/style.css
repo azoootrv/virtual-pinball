@@ -126,6 +126,8 @@ body {
   display: block;
   object-fit: contain;
   touch-action: none;
+  outline: none;
+  cursor: crosshair;
 }
 
 .overlay {

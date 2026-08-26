@@ -25,7 +25,7 @@ npm run preview
 | Left flipper | `Z`, `←`, left shift | Left |
 | Right flipper | `X`, `→`, right shift | Right |
 | Both flippers | Shift | — |
-| Plunge | Hold `Space` or `↓`, then release | Plunge |
+| Plunge | Hold `Space` or `↓`, then release | Hold the right launch lane, or Plunge |
 | Start | `Enter` / `Space` / Press Start | Press Start |
 
 ## Rules

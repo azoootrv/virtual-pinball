@@ -67,6 +67,52 @@ export class Input {
     el.addEventListener("pointercancel", end);
   }
 
+  bindCanvas(canvas: HTMLCanvasElement, worldW: number, worldH: number, laneInnerX: number): void {
+    const worldFromEvent = (event: PointerEvent): { x: number; y: number } => {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: ((event.clientX - rect.left) / Math.max(rect.width, 1)) * worldW,
+        y: ((event.clientY - rect.top) / Math.max(rect.height, 1)) * worldH,
+      };
+    };
+
+    const apply = (event: PointerEvent, down: boolean): void => {
+      const point = worldFromEvent(event);
+      if (point.x >= laneInnerX) {
+        this.plunge = down;
+        if (down) this.startQueued = true;
+        if (!down) {
+          this.left = false;
+          this.right = false;
+        }
+        return;
+      }
+      if (down) {
+        this.left = point.x < worldW * 0.48;
+        this.right = point.x >= worldW * 0.48;
+      } else {
+        this.left = false;
+        this.right = false;
+      }
+    };
+
+    canvas.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      canvas.focus();
+      canvas.setPointerCapture(event.pointerId);
+      apply(event, true);
+    });
+    canvas.addEventListener("pointerup", (event) => {
+      event.preventDefault();
+      apply(event, false);
+    });
+    canvas.addEventListener("pointercancel", () => {
+      this.left = false;
+      this.right = false;
+      this.plunge = false;
+    });
+  }
+
   consumeStart(): boolean {
     const was = this.startQueued;
     this.startQueued = false;

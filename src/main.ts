@@ -1,7 +1,7 @@
 import "./style.css";
 import { PinballGame } from "./game/game.ts";
 import { Input } from "./game/input.ts";
-import { TABLE_H, TABLE_W } from "./game/constants.ts";
+import { LANE_INNER, TABLE_H, TABLE_W } from "./game/constants.ts";
 
 function must<T>(value: T | null, name: string): T {
   if (!value) throw new Error(`ARC LIGHT failed to mount: missing ${name}.`);
@@ -25,6 +25,8 @@ const ctx = must(canvas.getContext("2d"), "2d context");
 const game = new PinballGame();
 const input = new Input();
 input.attach(window);
+canvas.tabIndex = 0;
+input.bindCanvas(canvas, TABLE_W, TABLE_H, LANE_INNER);
 
 const touchLeft = document.querySelector<HTMLButtonElement>("#touch-left");
 const touchRight = document.querySelector<HTMLButtonElement>("#touch-right");
@@ -56,7 +58,7 @@ function setOverlay(mode: "attract" | "hidden" | "game-over", score = 0): void {
     overlayBody.textContent =
       "Charge the plunger, slap the flippers, and complete A-R-C for a hotter multiplier. Light the left bank to arm kickback.";
     startBtn.textContent = "Press Start";
-    hint.textContent = "Hold Space in the launch lane, then flip to keep the ball alive.";
+    hint.textContent = "Hold Space or the right launch lane, then flip to keep the ball alive.";
   }
   if (mode === "game-over") {
     overlayKicker.textContent = "Tilt-free finish";
