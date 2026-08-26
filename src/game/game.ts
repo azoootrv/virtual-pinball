@@ -59,7 +59,7 @@ export class PinballGame {
 
   constructor() {
     this.engine = Engine.create({
-      gravity: { x: 0, y: 0.95 },
+      gravity: { x: 0, y: 1.15, scale: 0.0012 },
       positionIterations: 12,
       velocityIterations: 10,
     });
@@ -249,6 +249,8 @@ export class PinballGame {
         } else if (other.label.startsWith("target:")) {
           const id = Number(other.label.split(":")[1]);
           this.onTarget(id);
+        } else if (other.label.startsWith("flipper:")) {
+          this.onFlipper(other);
         } else if (other.label === "kick-target") {
           this.onKickTarget();
         } else if (other.label === "kickback-zone") {
@@ -327,6 +329,17 @@ export class PinballGame {
       this.audio.bonus();
       for (const item of bank) item.hit = false;
     }
+  }
+
+  private onFlipper(flipperBody: Matter.Body): void {
+    if (!this.ball || this.phase === "attract") return;
+    const omega = flipperBody.angularVelocity;
+    if (Math.abs(omega) < 0.05) return;
+    const inward = flipperBody.label.endsWith("left") ? 2.4 : -2.4;
+    Body.setVelocity(this.ball, {
+      x: this.ball.velocity.x + inward + omega * 8,
+      y: this.ball.velocity.y - Math.abs(omega) * 22,
+    });
   }
 
   private onKickTarget(): void {
@@ -424,16 +437,25 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 22 : 13;
-  const current = flipper.body.angle;
+  const speed = pressed ? 24 : 14;
+  const body = flipper.body as Matter.Body & {
+    positionPrev: { x: number; y: number };
+    anglePrev: number;
+  };
+  const current = body.angle;
   const diff = target - current;
   const maxStep = speed * dt;
   const step = Math.abs(diff) <= maxStep ? diff : Math.sign(diff) * maxStep;
   const next = current + step;
   const cx = flipper.pivot.x - flipper.localPivotX * Math.cos(next);
   const cy = flipper.pivot.y - flipper.localPivotX * Math.sin(next);
-  Body.setPosition(flipper.body, { x: cx, y: cy });
-  Body.setAngle(flipper.body, next);
-  Body.setAngularVelocity(flipper.body, dt > 0 ? step / dt : 0);
-  Body.setVelocity(flipper.body, { x: 0, y: 0 });
+  const prevX = body.position.x;
+  const prevY = body.position.y;
+  Body.setPosition(body, { x: cx, y: cy });
+  Body.setAngle(body, next);
+  body.positionPrev.x = prevX;
+  body.positionPrev.y = prevY;
+  body.anglePrev = current;
+  Body.setVelocity(body, { x: cx - prevX, y: cy - prevY });
+  Body.setAngularVelocity(body, step);
 }

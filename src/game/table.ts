@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 import { BALL_R, CAT, LANE_INNER, LANE_OUTER, LEFT, PLAY_CENTER, TABLE_H } from "./constants.ts";
 
-const { Bodies, Body, Composite } = Matter;
+const { Bodies, Composite } = Matter;
 
 export type BumperDef = {
   id: number;
@@ -102,14 +102,15 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
     angle: restAngle,
+    isStatic: true,
     restitution: 0,
-    friction: 0.9,
-    density: 0.4,
+    friction: 0.08,
     label: `flipper:${side}`,
     chamfer: { radius: 7 },
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
-  Body.setInertia(body, Infinity);
+  body.friction = 0.08;
+  body.restitution = 0;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
 
