@@ -96,17 +96,13 @@ function drawLaneLights(ctx: CanvasRenderingContext2D, lanes: LaneDef[], skillLa
     const skill = skillLane === lane.id;
     if (!lane.lit && !skill) continue;
     const color = lane.lit ? COLORS.lime : COLORS.amber;
-    glow(ctx, color, 18);
-    ctx.globalAlpha = 0.55;
+    glow(ctx, color, 20);
+    ctx.globalAlpha = 0.4;
     roundRect(ctx, x - 26, y - 20, 52, 40, 6);
-    ctx.fillStyle = color;
-    ctx.fill();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.stroke();
     ctx.globalAlpha = 1;
-    ctx.fillStyle = "#071018";
-    ctx.font = "800 18px Orbitron, sans-serif";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(lane.letter, x, y);
     noGlow(ctx);
   }
 }
