@@ -64,7 +64,6 @@ export class Input {
     };
     el.addEventListener("pointerdown", start);
     el.addEventListener("pointerup", end);
-    el.addEventListener("pointerleave", end);
     el.addEventListener("pointercancel", end);
   }
 

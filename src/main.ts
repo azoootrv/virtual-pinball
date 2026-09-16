@@ -118,7 +118,7 @@ function frame(now: number): void {
   const dt = now - last;
   last = now;
 
-  if ((game.phase === "attract" || game.phase === "game-over") && input.consumeStart()) {
+  if ((game.phase === "attract" || game.phase === "game-over") && (input.consumeStart() || input.plunge)) {
     begin();
   } else {
     input.consumeStart();

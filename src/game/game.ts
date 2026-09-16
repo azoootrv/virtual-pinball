@@ -166,7 +166,8 @@ export class PinballGame {
       } else if (input.plunge) {
         this.powerParked = false;
         this.plunger = Math.min(1, this.plunger + dt * 1.15);
-      } else if (this.prevPlunge && this.plunger > 0.05) {
+      } else if (this.prevPlunge) {
+        if (this.plunger < 0.55) this.plunger = 0.72;
         this.launch();
       } else if (!this.powerParked) {
         this.plunger = Math.max(0, this.plunger - dt * 1.6);
