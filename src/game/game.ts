@@ -111,12 +111,8 @@ export class PinballGame {
     this.handleInput(input, dt);
     this.accumulator += Math.min(dtMs, 48);
     while (this.accumulator >= STEP) {
-      const half = STEP / 2;
-      this.syncFlippers(half / 1000, input);
-      Engine.update(this.engine, half);
-      this.afterPhysics();
-      this.syncFlippers(half / 1000, input);
-      Engine.update(this.engine, half);
+      this.syncFlippers(STEP / 1000, input);
+      Engine.update(this.engine, STEP);
       this.afterPhysics();
       this.accumulator -= STEP;
     }
@@ -238,15 +234,19 @@ export class PinballGame {
     const ball = this.ball;
     if (!ball) return;
 
-    const maxSpeed = ball.position.y > FLIPPER_ZONE_Y ? FLIPPER_ZONE_SPEED : MAX_BALL_SPEED;
+    const onPlayfield = ball.position.x < LANE_INNER - 4;
+    const maxSpeed =
+      onPlayfield && ball.position.y > FLIPPER_ZONE_Y ? FLIPPER_ZONE_SPEED : MAX_BALL_SPEED;
     const speed = Vector.magnitude(ball.velocity);
     if (speed > maxSpeed) {
       Body.setVelocity(ball, Vector.mult(Vector.normalise(ball.velocity), maxSpeed));
     }
 
-    const prev = { x: this.prevBallX, y: this.prevBallY };
-    separateBallFromFlipper(ball, this.table.leftFlipper, prev);
-    separateBallFromFlipper(ball, this.table.rightFlipper, prev);
+    if (onPlayfield) {
+      const prev = { x: this.prevBallX, y: this.prevBallY };
+      separateBallFromFlipper(ball, this.table.leftFlipper, prev);
+      separateBallFromFlipper(ball, this.table.rightFlipper, prev);
+    }
     this.rememberBall();
 
     if (this.phase === "live" && ball.position.x < LANE_INNER - 8) {
@@ -256,8 +256,8 @@ export class PinballGame {
     const inLane = ball.position.x > LANE_INNER - 2 && ball.position.x < LANE_OUTER + 8;
     if (this.phase === "live" && inLane && ball.position.y < 350 && ball.velocity.y < -1) {
       Body.setVelocity(ball, {
-        x: Math.min(ball.velocity.x, -10),
-        y: ball.velocity.y * 0.92,
+        x: Math.min(ball.velocity.x, -12),
+        y: Math.max(ball.velocity.y * 0.88, -8),
       });
     }
 
@@ -380,8 +380,8 @@ export class PinballGame {
     if (!this.ball || this.phase !== "live") return;
     if (this.ball.velocity.y >= 0) return;
     Body.setVelocity(this.ball, {
-      x: -13,
-      y: Math.min(this.ball.velocity.y, -9),
+      x: -16,
+      y: Math.max(Math.min(this.ball.velocity.y, -6), -10),
     });
   }
 

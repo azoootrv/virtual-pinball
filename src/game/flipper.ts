@@ -112,7 +112,7 @@ export function separateBallFromFlipper(
   let vy = ball.velocity.y;
   const vn = vx * nx + vy * ny;
   if (vn < -0.35) {
-    const bounce = 1.22;
+    const bounce = 0.42;
     vx -= (1 + bounce) * vn * nx;
     vy -= (1 + bounce) * vn * ny;
   } else if (vn < 0) {

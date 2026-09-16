@@ -124,19 +124,21 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
 function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(80, 778);
-  ctx.lineTo(140, 888);
-  ctx.lineTo(178, 1012);
-  ctx.lineTo(452, 1012);
-  ctx.lineTo(490, 888);
-  ctx.lineTo(536, 778);
+  ctx.moveTo(88, 808);
+  ctx.lineTo(148, 900);
+  ctx.lineTo(182, 1012);
+  ctx.lineTo(448, 1012);
+  ctx.lineTo(482, 900);
+  ctx.lineTo(532, 808);
   ctx.closePath();
-  const felt = ctx.createLinearGradient(0, 778, 0, 1012);
-  felt.addColorStop(0, "#07101f");
-  felt.addColorStop(0.45, "#050814");
+  ctx.clip();
+  const felt = ctx.createLinearGradient(0, 800, 0, 1012);
+  felt.addColorStop(0, "rgba(5,8,20,0)");
+  felt.addColorStop(0.18, "#07101f");
+  felt.addColorStop(0.5, "#050814");
   felt.addColorStop(1, "#03040c");
   ctx.fillStyle = felt;
-  ctx.fill();
+  ctx.fillRect(70, 790, 480, 240);
 
   ctx.fillStyle = "#b7e7ff";
   const stars: [number, number, number][] = [
