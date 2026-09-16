@@ -13,6 +13,7 @@ import {
   TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
+import { separateBallFromFlipper } from "./flipper.ts";
 import { burst, tickFx, type Particle, type ScorePopup } from "./particles.ts";
 import { drawTable } from "./render.ts";
 import { buildTable, makeBall, type FlipperDef, type TableParts } from "./table.ts";
@@ -23,6 +24,8 @@ export type Phase = "attract" | "plunging" | "live" | "ball-lost" | "game-over";
 
 const STEP = 1000 / 60;
 const MAX_BALL_SPEED = 30;
+const FLIPPER_ZONE_Y = 760;
+const FLIPPER_ZONE_SPEED = 16;
 
 function readHighScore(): number {
   const raw = localStorage.getItem(HIGH_SCORE_KEY);
@@ -54,6 +57,8 @@ export class PinballGame {
   hudDirty = true;
 
   private ball: Matter.Body | null = null;
+  private prevBallX = 0;
+  private prevBallY = 0;
   private accumulator = 0;
   private combo = 0;
   private comboTimer = 0;
@@ -65,8 +70,8 @@ export class PinballGame {
   constructor() {
     this.engine = Engine.create({
       gravity: { x: 0, y: 1.15, scale: 0.0012 },
-      positionIterations: 12,
-      velocityIterations: 10,
+      positionIterations: 16,
+      velocityIterations: 12,
     });
     this.table = buildTable(this.engine.world);
     this.bindCollisions();
@@ -106,8 +111,12 @@ export class PinballGame {
     this.handleInput(input, dt);
     this.accumulator += Math.min(dtMs, 48);
     while (this.accumulator >= STEP) {
-      this.syncFlippers(STEP / 1000, input);
-      Engine.update(this.engine, STEP);
+      const half = STEP / 2;
+      this.syncFlippers(half / 1000, input);
+      Engine.update(this.engine, half);
+      this.afterPhysics();
+      this.syncFlippers(half / 1000, input);
+      Engine.update(this.engine, half);
       this.afterPhysics();
       this.accumulator -= STEP;
     }
@@ -181,6 +190,7 @@ export class PinballGame {
       x: this.table.launchSpawn.x,
       y: this.table.launchSpawn.y - 24,
     });
+    this.rememberBall();
     this.plunger = 0;
     this.powerParked = false;
     this.skillArmed = true;
@@ -200,6 +210,7 @@ export class PinballGame {
     const spawn = this.table.launchSpawn;
     this.ball = makeBall(spawn.x, spawn.y);
     Composite.add(this.engine.world, this.ball);
+    this.rememberBall();
   }
 
   private parkDemoBall(): void {
@@ -217,14 +228,26 @@ export class PinballGame {
     moveFlipper(this.table.rightFlipper, input.right, dt);
   }
 
+  private rememberBall(): void {
+    if (!this.ball) return;
+    this.prevBallX = this.ball.position.x;
+    this.prevBallY = this.ball.position.y;
+  }
+
   private afterPhysics(): void {
     const ball = this.ball;
     if (!ball) return;
 
+    const maxSpeed = ball.position.y > FLIPPER_ZONE_Y ? FLIPPER_ZONE_SPEED : MAX_BALL_SPEED;
     const speed = Vector.magnitude(ball.velocity);
-    if (speed > MAX_BALL_SPEED) {
-      Body.setVelocity(ball, Vector.mult(Vector.normalise(ball.velocity), MAX_BALL_SPEED));
+    if (speed > maxSpeed) {
+      Body.setVelocity(ball, Vector.mult(Vector.normalise(ball.velocity), maxSpeed));
     }
+
+    const prev = { x: this.prevBallX, y: this.prevBallY };
+    separateBallFromFlipper(ball, this.table.leftFlipper, prev);
+    separateBallFromFlipper(ball, this.table.rightFlipper, prev);
+    this.rememberBall();
 
     if (this.phase === "live" && ball.position.x < LANE_INNER - 8) {
       this.closeGate();
@@ -269,8 +292,6 @@ export class PinballGame {
         } else if (other.label.startsWith("target:")) {
           const id = Number(other.label.split(":")[1]);
           this.onTarget(id);
-        } else if (other.label.startsWith("flipper:")) {
-          this.onFlipper(other);
         } else if (other.label === "launch-turn") {
           this.onLaunchTurn();
         } else if (other.label === "saucer") {
@@ -355,17 +376,6 @@ export class PinballGame {
     }
   }
 
-  private onFlipper(flipperBody: Matter.Body): void {
-    if (!this.ball || this.phase === "attract") return;
-    const omega = flipperBody.angularVelocity;
-    if (Math.abs(omega) < 0.05) return;
-    const inward = flipperBody.label.endsWith("left") ? 2.4 : -2.4;
-    Body.setVelocity(this.ball, {
-      x: this.ball.velocity.x + inward + omega * 8,
-      y: this.ball.velocity.y - Math.abs(omega) * 22,
-    });
-  }
-
   private onLaunchTurn(): void {
     if (!this.ball || this.phase !== "live") return;
     if (this.ball.velocity.y >= 0) return;
@@ -404,6 +414,7 @@ export class PinballGame {
     this.kickbackLit = false;
     Body.setVelocity(this.ball, { x: 4, y: -22 });
     Body.setPosition(this.ball, { x: 130, y: 860 });
+    this.rememberBall();
     this.addScore(1000, 130, 860);
     this.flash("KICKBACK");
     this.audio.kickback();

@@ -106,24 +106,25 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 88;
-  const width = 14;
-  const pivot = side === "left" ? { x: 228, y: 888 } : { x: 418, y: 888 };
-  const localPivotX = side === "left" ? -(length / 2 - 7) : length / 2 - 7;
-  const restAngle = side === "left" ? 0.48 : -0.48;
-  const upAngle = side === "left" ? -0.5 : 0.5;
+  const length = 102;
+  const width = 26;
+  const pivot = side === "left" ? { x: 214, y: 952 } : { x: 416, y: 952 };
+  const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
+  const restAngle = side === "left" ? 0.46 : -0.46;
+  const upAngle = side === "left" ? -0.62 : 0.62;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
     angle: restAngle,
     isStatic: true,
+    isSensor: true,
     restitution: 0,
-    friction: 0.08,
+    friction: 0.18,
+    slop: 0,
     label: `flipper:${side}`,
-    chamfer: { radius: 7 },
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
-  body.friction = 0.08;
+  body.friction = 0.18;
   body.restitution = 0;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
@@ -150,28 +151,28 @@ export const LAUNCH_INNER: [number, number][] = [
 
 export const LEFT_OUTLANE: [number, number][] = [
   [LEFT, 720],
-  [88, 820],
-  [140, 900],
-  [186, 942],
+  [90, 830],
+  [148, 930],
+  [188, 1000],
 ];
 
 export const RIGHT_OUTLANE: [number, number][] = [
   [LANE_INNER, 720],
-  [530, 820],
-  [478, 900],
-  [432, 942],
+  [528, 830],
+  [470, 930],
+  [430, 1000],
 ];
 
 export const LEFT_INLANE: [number, number][] = [
-  [148, 742],
-  [196, 850],
-  [228, 888],
+  [150, 760],
+  [188, 890],
+  [214, 952],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
-  [470, 742],
-  [440, 850],
-  [418, 888],
+  [468, 760],
+  [430, 890],
+  [416, 952],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -265,7 +266,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     post(328, 620, 7),
   ];
 
-  const leftSling = Bodies.rectangle(176, 800, 82, 12, {
+  const leftSling = Bodies.rectangle(176, 838, 82, 14, {
     isStatic: true,
     angle: 1.08,
     restitution: 1.2,
@@ -273,7 +274,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     label: "sling:left",
     collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
-  const rightSling = Bodies.rectangle(442, 800, 82, 12, {
+  const rightSling = Bodies.rectangle(442, 838, 82, 14, {
     isStatic: true,
     angle: -1.08,
     restitution: 1.2,
@@ -292,7 +293,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
 
-  const kickZone = Bodies.rectangle(120, 920, 54, 48, {
+  const kickZone = Bodies.rectangle(120, 940, 54, 48, {
     isStatic: true,
     isSensor: true,
     label: "kickback-zone",
@@ -339,8 +340,8 @@ export function buildTable(world: Matter.Composite): TableParts {
     lanes,
     posts,
     slings: [
-      { id: "left", body: leftSling, origin: { x: 150, y: 790 }, flash: 0 },
-      { id: "right", body: rightSling, origin: { x: 468, y: 790 }, flash: 0 },
+      { id: "left", body: leftSling, origin: { x: 150, y: 828 }, flash: 0 },
+      { id: "right", body: rightSling, origin: { x: 468, y: 828 }, flash: 0 },
     ],
     saucer: { body: saucerBody, flash: 0 },
     leftFlipper,

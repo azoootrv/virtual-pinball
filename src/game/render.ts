@@ -121,6 +121,69 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
   ctx.restore();
 }
 
+function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(80, 778);
+  ctx.lineTo(140, 888);
+  ctx.lineTo(178, 1012);
+  ctx.lineTo(452, 1012);
+  ctx.lineTo(490, 888);
+  ctx.lineTo(536, 778);
+  ctx.closePath();
+  const felt = ctx.createLinearGradient(0, 778, 0, 1012);
+  felt.addColorStop(0, "#07101f");
+  felt.addColorStop(0.45, "#050814");
+  felt.addColorStop(1, "#03040c");
+  ctx.fillStyle = felt;
+  ctx.fill();
+
+  ctx.fillStyle = "#b7e7ff";
+  const stars: [number, number, number][] = [
+    [168, 806, 1.1],
+    [204, 792, 0.8],
+    [238, 818, 1.3],
+    [276, 798, 0.7],
+    [312, 824, 1.0],
+    [348, 790, 0.9],
+    [386, 814, 1.2],
+    [422, 800, 0.7],
+    [456, 828, 1.1],
+    [190, 860, 0.8],
+    [248, 848, 1.0],
+    [310, 868, 0.7],
+    [372, 852, 1.1],
+    [430, 874, 0.8],
+    [220, 912, 0.9],
+    [286, 898, 0.7],
+    [354, 918, 1.0],
+    [408, 904, 0.8],
+    [258, 946, 0.7],
+    [330, 958, 1.0],
+    [392, 944, 0.8],
+  ];
+  for (const [x, y, size] of stars) {
+    ctx.globalAlpha = 0.22 + size * 0.18;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 0.28;
+  ctx.strokeStyle = "#3dfff8";
+  ctx.lineWidth = 3;
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  ctx.moveTo(148, 812);
+  ctx.lineTo(214, 952);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(478, 812);
+  ctx.lineTo(416, 952);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
   const { body, length, width } = flipper;
   ctx.save();
@@ -128,9 +191,9 @@ function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
   ctx.rotate(body.angle);
   const hw = length / 2;
   const hh = width / 2;
-  glow(ctx, COLORS.cyan, 18);
+  glow(ctx, COLORS.cyan, 20);
   ctx.fillStyle = COLORS.cyan;
-  roundRect(ctx, -hw, -hh, length, width, 8);
+  roundRect(ctx, -hw, -hh, length, width, hh);
   ctx.fill();
   noGlow(ctx);
   const core = ctx.createLinearGradient(-hw, 0, hw, 0);
@@ -138,11 +201,11 @@ function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
   core.addColorStop(0.45, "#7af6ff");
   core.addColorStop(1, "#2a8ea8");
   ctx.fillStyle = core;
-  roundRect(ctx, -hw + 1, -hh + 2, length - 2, width - 4, 6);
+  roundRect(ctx, -hw + 2, -hh + 3, length - 4, width - 6, hh - 3);
   ctx.fill();
   ctx.fillStyle = "#061018";
   ctx.beginPath();
-  ctx.arc(flipper.localPivotX, 0, 4.5, 0, Math.PI * 2);
+  ctx.arc(flipper.localPivotX, 0, 5, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -230,10 +293,11 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
     ctx.fillStyle = COLORS.lime;
     ctx.font = "700 11px Orbitron, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("KICKBACK", 126, 888);
+    ctx.fillText("KICKBACK", 126, 918);
     noGlow(ctx);
   }
 
+  coverPaintedFlippers(ctx);
   drawPlunger(ctx, state.plunger, state.table.launchSpawn.x);
   drawFlipper(ctx, state.table.leftFlipper);
   drawFlipper(ctx, state.table.rightFlipper);
