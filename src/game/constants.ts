@@ -1,10 +1,10 @@
-export const TABLE_W = 500;
-export const TABLE_H = 900;
+export const TABLE_W = 668;
+export const TABLE_H = 1024;
 
 export const BALL_R = 11;
-export const LEFT = 24;
-export const LANE_INNER = 438;
-export const LANE_OUTER = 488;
+export const LEFT = 70;
+export const LANE_INNER = 548;
+export const LANE_OUTER = 612;
 export const PLAY_CENTER = (LEFT + LANE_INNER) / 2;
 
 export const CAT = {
@@ -14,14 +14,13 @@ export const CAT = {
 } as const;
 
 export const COLORS = {
-  bg: "#07061a",
-  felt: "#10143a",
-  feltHi: "#1a2260",
-  cyan: "#2cf6ff",
-  magenta: "#ff3de1",
-  amber: "#ffc14a",
+  bg: "#050614",
+  felt: "#0b1230",
+  cyan: "#3dfff8",
+  magenta: "#ff2ec8",
+  amber: "#ffe14a",
   lime: "#5dff9f",
-  wall: "#8be9ff",
+  wall: "#7af6ff",
   metal: "#d5e4f7",
   drain: "#ff5d7a",
 } as const;

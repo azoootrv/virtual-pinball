@@ -7,6 +7,9 @@ import {
   EXTRA_BALL_AT,
   HIGH_SCORE_KEY,
   LANE_INNER,
+  PLAY_CENTER,
+  TABLE_H,
+  TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
 import { burst, tickFx, type Particle, type ScorePopup } from "./particles.ts";
@@ -219,14 +222,14 @@ export class PinballGame {
       this.closeGate();
     }
 
-    if (this.phase === "live" && ball.position.x > LANE_INNER + 8 && ball.position.y > 500 && ball.velocity.y > 2) {
+    if (this.phase === "live" && ball.position.x > LANE_INNER + 8 && ball.position.y > 620 && ball.velocity.y > 2) {
       this.phase = "plunging";
       this.openGate();
       Body.setVelocity(ball, { x: 0, y: Math.min(ball.velocity.y, 8) });
       this.flash("RE-PLUNGE");
     }
 
-    if (ball.position.y > 910 || ball.position.x < -40 || ball.position.x > 540) {
+    if (ball.position.y > TABLE_H - 12 || ball.position.x < -40 || ball.position.x > TABLE_W + 40) {
       this.onDrain();
     }
   }
@@ -252,6 +255,8 @@ export class PinballGame {
           this.onTarget(id);
         } else if (other.label.startsWith("flipper:")) {
           this.onFlipper(other);
+        } else if (other.label === "saucer") {
+          this.onSaucer();
         } else if (other.label === "kick-target") {
           this.onKickTarget();
         } else if (other.label === "kickback-zone") {
@@ -305,7 +310,7 @@ export class PinballGame {
       lane.lit = true;
       if (this.table.lanes.every((item) => item.lit)) {
         this.multiplier = Math.min(4, this.multiplier + 1);
-        this.addScore(2500, 231, 140);
+        this.addScore(2500, PLAY_CENTER, 220);
         this.flash(`${this.multiplier}× PLAY`);
         this.audio.bonus();
         this.resetLanes();
@@ -324,7 +329,7 @@ export class PinballGame {
     this.skillArmed = false;
     const bank = this.table.targets.filter((item) => item.id < 3);
     if (bank.every((item) => item.hit)) {
-      this.addScore(3000, 90, 430);
+      this.addScore(3000, 120, 520);
       this.kickbackLit = true;
       this.flash("KICKBACK LIT");
       this.audio.bonus();
@@ -343,13 +348,25 @@ export class PinballGame {
     });
   }
 
+  private onSaucer(): void {
+    if (!this.ball || this.phase === "attract") return;
+    this.table.saucer.flash = 1;
+    const pos = this.table.saucer.body.position;
+    const dir = Vector.normalise(Vector.sub(this.ball.position, pos));
+    Body.setVelocity(this.ball, Vector.add(this.ball.velocity, Vector.mult(dir, 9)));
+    this.addScore(1500, pos.x, pos.y - 24);
+    burst(this.particles, pos.x, pos.y, COLORS.magenta, 18, 6);
+    this.audio.bonus();
+    this.skillArmed = false;
+  }
+
   private onKickTarget(): void {
     const target = this.table.targets.find((item) => item.id === 3);
     if (!target || this.phase === "attract") return;
     target.flash = 1;
     target.hit = true;
     this.kickbackLit = true;
-    this.addScore(750, 404, 400);
+    this.addScore(750, 520, 520);
     this.flash("KICKBACK LIT");
     this.audio.target();
     this.skillArmed = false;
@@ -358,12 +375,12 @@ export class PinballGame {
   private onKickZone(): void {
     if (!this.kickbackLit || !this.ball || this.phase !== "live") return;
     this.kickbackLit = false;
-    Body.setVelocity(this.ball, { x: 4, y: -20 });
-    Body.setPosition(this.ball, { x: 90, y: 760 });
-    this.addScore(1000, 90, 760);
+    Body.setVelocity(this.ball, { x: 4, y: -22 });
+    Body.setPosition(this.ball, { x: 130, y: 860 });
+    this.addScore(1000, 130, 860);
     this.flash("KICKBACK");
     this.audio.kickback();
-    burst(this.particles, 90, 800, COLORS.lime, 20, 6);
+    burst(this.particles, 130, 900, COLORS.lime, 20, 6);
   }
 
   private onDrain(): void {
@@ -372,7 +389,7 @@ export class PinballGame {
       return;
     }
     if (this.phase !== "live" && this.phase !== "plunging") return;
-    burst(this.particles, this.ball?.position.x ?? 231, 860, COLORS.drain, 18, 4);
+    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 960, COLORS.drain, 18, 4);
     this.audio.drain();
     this.removeBall();
     this.openGate();
@@ -422,6 +439,7 @@ export class PinballGame {
     for (const bumper of this.table.bumpers) bumper.flash = Math.max(0, bumper.flash - dt * 3);
     for (const target of this.table.targets) target.flash = Math.max(0, target.flash - dt * 3);
     for (const sling of this.table.slings) sling.flash = Math.max(0, sling.flash - dt * 3.5);
+    this.table.saucer.flash = Math.max(0, this.table.saucer.flash - dt * 3);
   }
 
   private closeGate(): void {
