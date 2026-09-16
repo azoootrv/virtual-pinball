@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:physics": "node --experimental-strip-types scripts/test-flipper.ts"
   },
   "devDependencies": {
     "@types/matter-js": "^0.20.2",
