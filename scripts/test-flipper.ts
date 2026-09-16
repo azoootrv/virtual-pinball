@@ -10,36 +10,51 @@ function fail(message: string): never {
   process.exit(1);
 }
 
-function simulateDropOntoFlipper(): void {
+function simulateDropOntoFlipper(start = { x: 248, y: 820 }, label = "left shaft"): void {
   const engine = Engine.create({
     gravity: { x: 0, y: 1.15, scale: 0.0012 },
     positionIterations: 16,
     velocityIterations: 12,
   });
   const table = buildTable(engine.world);
-  const start = { x: 248, y: 820 };
   const ball = makeBall(start.x, start.y);
   Composite.add(engine.world, ball);
   Body.setVelocity(ball, { x: 0, y: 14 });
 
   let prev = { ...start };
   let bounced = false;
+  let stuckFrames = 0;
+  let drained = false;
 
-  for (let i = 0; i < 90; i += 1) {
+  for (let i = 0; i < 140; i += 1) {
     Engine.update(engine, 1000 / 60);
     const hitLeft = separateBallFromFlipper(ball, table.leftFlipper, prev);
     const hitRight = separateBallFromFlipper(ball, table.rightFlipper, prev);
     if (hitLeft || hitRight) bounced = true;
     prev = { x: ball.position.x, y: ball.position.y };
+    const speed = Math.hypot(ball.velocity.x, ball.velocity.y);
 
-    if (ball.position.y > 990 && ball.position.x > 200 && ball.position.x < 300) {
+    if (i < 10 && ball.position.y > 1005 && ball.position.x > 200 && ball.position.x < 260) {
       fail(`ball tunneled through left flipper at (${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`);
+    }
+
+    const inDrain = ball.position.x > 268 && ball.position.x < 362 && ball.position.y > 990;
+    if (inDrain || ball.position.y > 1020) drained = true;
+    if (bounced && speed < 0.4 && ball.position.y < 1000) stuckFrames += 1;
+    else stuckFrames = 0;
+    if (stuckFrames > 28) {
+      fail(`ball stuck on flipper at (${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`);
     }
   }
 
   if (!bounced) fail("drop never registered a flipper hit");
+  if (!drained) {
+    fail(
+      `ball did not roll into the drain, end=(${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`,
+    );
+  }
   console.log(
-    `flipper drop ok: bounced=${bounced} end=(${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)}) vy=${ball.velocity.y.toFixed(2)}`,
+    `flipper drop (${label}) ok: bounced=${bounced} drained=${drained} end=(${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`,
   );
 }
 
@@ -99,5 +114,6 @@ function simulateLaunchTurn(): void {
 }
 
 simulateDropOntoFlipper();
+simulateDropOntoFlipper({ x: 392, y: 860 }, "right shaft");
 simulateLaunchTurn();
 console.log("all physics checks passed");

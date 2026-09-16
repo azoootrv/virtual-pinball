@@ -106,12 +106,12 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 102;
-  const width = 26;
-  const pivot = side === "left" ? { x: 214, y: 952 } : { x: 416, y: 952 };
-  const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
-  const restAngle = side === "left" ? 0.46 : -0.46;
-  const upAngle = side === "left" ? -0.62 : 0.62;
+  const length = 96;
+  const width = 24;
+  const pivot = side === "left" ? { x: 206, y: 948 } : { x: 424, y: 948 };
+  const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
+  const restAngle = side === "left" ? 0.72 : -0.72;
+  const upAngle = side === "left" ? -0.58 : 0.58;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
@@ -119,12 +119,12 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     isStatic: true,
     isSensor: true,
     restitution: 0,
-    friction: 0.18,
+    friction: 0,
     slop: 0,
     label: `flipper:${side}`,
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
-  body.friction = 0.18;
+  body.friction = 0;
   body.restitution = 0;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
@@ -166,13 +166,13 @@ export const RIGHT_OUTLANE: [number, number][] = [
 export const LEFT_INLANE: [number, number][] = [
   [150, 760],
   [188, 890],
-  [214, 952],
+  [206, 948],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
   [430, 890],
-  [416, 952],
+  [424, 948],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {

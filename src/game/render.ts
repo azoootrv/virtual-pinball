@@ -121,71 +121,6 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
   ctx.restore();
 }
 
-function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
-  ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(88, 808);
-  ctx.lineTo(148, 900);
-  ctx.lineTo(182, 1012);
-  ctx.lineTo(448, 1012);
-  ctx.lineTo(482, 900);
-  ctx.lineTo(532, 808);
-  ctx.closePath();
-  ctx.clip();
-  const felt = ctx.createLinearGradient(0, 800, 0, 1012);
-  felt.addColorStop(0, "rgba(5,8,20,0)");
-  felt.addColorStop(0.18, "#07101f");
-  felt.addColorStop(0.5, "#050814");
-  felt.addColorStop(1, "#03040c");
-  ctx.fillStyle = felt;
-  ctx.fillRect(70, 790, 480, 240);
-
-  ctx.fillStyle = "#b7e7ff";
-  const stars: [number, number, number][] = [
-    [168, 806, 1.1],
-    [204, 792, 0.8],
-    [238, 818, 1.3],
-    [276, 798, 0.7],
-    [312, 824, 1.0],
-    [348, 790, 0.9],
-    [386, 814, 1.2],
-    [422, 800, 0.7],
-    [456, 828, 1.1],
-    [190, 860, 0.8],
-    [248, 848, 1.0],
-    [310, 868, 0.7],
-    [372, 852, 1.1],
-    [430, 874, 0.8],
-    [220, 912, 0.9],
-    [286, 898, 0.7],
-    [354, 918, 1.0],
-    [408, 904, 0.8],
-    [258, 946, 0.7],
-    [330, 958, 1.0],
-    [392, 944, 0.8],
-  ];
-  for (const [x, y, size] of stars) {
-    ctx.globalAlpha = 0.22 + size * 0.18;
-    ctx.beginPath();
-    ctx.arc(x, y, size, 0, Math.PI * 2);
-    ctx.fill();
-  }
-  ctx.globalAlpha = 0.28;
-  ctx.strokeStyle = "#3dfff8";
-  ctx.lineWidth = 3;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(148, 812);
-  ctx.lineTo(214, 952);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(478, 812);
-  ctx.lineTo(416, 952);
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.restore();
-}
-
 function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
   const { body, length, width } = flipper;
   ctx.save();
@@ -299,7 +234,6 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
     noGlow(ctx);
   }
 
-  coverPaintedFlippers(ctx);
   drawPlunger(ctx, state.plunger, state.table.launchSpawn.x);
   drawFlipper(ctx, state.table.leftFlipper);
   drawFlipper(ctx, state.table.rightFlipper);
