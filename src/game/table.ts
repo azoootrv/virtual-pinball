@@ -136,14 +136,15 @@ export const OUTER_WALL: [number, number][] = [
   [190, 154],
   [PLAY_CENTER, 148],
   [430, 154],
-  [500, 168],
-  [540, 205],
-  [LANE_OUTER, 250],
+  [500, 156],
+  [548, 168],
+  [580, 188],
+  [LANE_OUTER, 240],
   [LANE_OUTER, 960],
 ];
 
 export const LAUNCH_INNER: [number, number][] = [
-  [LANE_INNER, 230],
+  [LANE_INNER, 360],
   [LANE_INNER, 960],
 ];
 
@@ -185,13 +186,12 @@ export function buildTable(world: Matter.Composite): TableParts {
 
   const walls = [
     ...chainWalls(OUTER_WALL, 18),
-    ...chainWalls(LAUNCH_INNER, 14, "launch-inner"),
+    ...chainWalls(LAUNCH_INNER, 12, "launch-inner"),
     ...chainWalls(LEFT_OUTLANE, 16),
     ...chainWalls(RIGHT_OUTLANE, 16),
     ...chainWalls(LEFT_INLANE, 14),
     ...chainWalls(RIGHT_INLANE, 14),
-    wallSegment(LANE_INNER + 2, 132, LANE_OUTER - 2, 132, 18, "lane-roof"),
-    wallSegment(LEFT - 6, 132, LANE_INNER - 30, 132, 16, "top-roof"),
+    wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
   ];
 
@@ -245,7 +245,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     return { id, body, letter: ["A", "R", "C"][id] ?? "A", lit: false };
   });
 
-  const saucerBody = Bodies.circle(508, 278, 28, {
+  const saucerBody = Bodies.circle(468, 248, 26, {
     isStatic: true,
     restitution: 1.2,
     friction: 0,
@@ -299,10 +299,17 @@ export function buildTable(world: Matter.Composite): TableParts {
     collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
 
-  const gate = Bodies.rectangle(LANE_INNER, 188, 14, 100, {
+  const gate = Bodies.rectangle(LANE_INNER, 328, 14, 72, {
     isStatic: true,
     label: "gate",
     collisionFilter: { category: CAT.table, mask: 0 },
+  });
+
+  const launchTurn = Bodies.rectangle((LANE_INNER + LANE_OUTER) / 2, 300, 56, 50, {
+    isStatic: true,
+    isSensor: true,
+    label: "launch-turn",
+    collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
 
   const launchSpawn = { x: (LANE_INNER + LANE_OUTER) / 2, y: 910 };
@@ -321,6 +328,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     drain,
     kickZone,
     gate,
+    launchTurn,
   ]);
 
   return {

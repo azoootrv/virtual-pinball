@@ -244,6 +244,42 @@ kbd {
   padding: 6px 12px;
 }
 
+.power {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+
+.power span,
+.power strong {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--magenta);
+}
+
+.power-track {
+  height: 16px;
+  border: 1px solid #ff2ec866;
+  border-radius: 999px;
+  background: #140814;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: inset 0 0 10px #000;
+}
+
+.power-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7a1a88, var(--magenta), #ffe14a);
+  box-shadow: 0 0 12px #ff2ec8aa;
+  pointer-events: none;
+}
+
 .touch-pad {
   display: grid;
   grid-template-columns: 1fr 0.9fr 1fr;
@@ -277,6 +313,10 @@ kbd {
 
   .touch-pad {
     margin-top: 0;
+  }
+
+  .power {
+    margin-bottom: 6px;
   }
 }
 

@@ -7,6 +7,7 @@ import {
   EXTRA_BALL_AT,
   HIGH_SCORE_KEY,
   LANE_INNER,
+  LANE_OUTER,
   PLAY_CENTER,
   TABLE_H,
   TABLE_W,
@@ -21,7 +22,7 @@ const { Engine, Body, Composite, Events, Vector } = Matter;
 export type Phase = "attract" | "plunging" | "live" | "ball-lost" | "game-over";
 
 const STEP = 1000 / 60;
-const MAX_BALL_SPEED = 24;
+const MAX_BALL_SPEED = 30;
 
 function readHighScore(): number {
   const raw = localStorage.getItem(HIGH_SCORE_KEY);
@@ -42,6 +43,7 @@ export class PinballGame {
   ballsLeft = BALLS_PER_GAME;
   multiplier = 1;
   plunger = 0;
+  private powerParked = false;
   gateClosed = false;
   kickbackLit = false;
   extraAwarded = false;
@@ -143,6 +145,7 @@ export class PinballGame {
       high: this.highScore,
       balls: Math.max(0, this.ballsLeft),
       mult: this.multiplier,
+      plunger: this.plunger,
       phase: this.phase,
     };
   }
@@ -152,13 +155,16 @@ export class PinballGame {
     if (input.right && !this.prevRight) this.audio.flip();
 
     if (this.phase === "plunging" && this.ball) {
-      if (input.plunge) {
-        this.plunger = Math.min(1, this.plunger + dt * 1.35);
-      } else if (this.prevPlunge) {
-        if (this.plunger < 0.45) this.plunger = 0.62;
+      if (input.powerOverride !== null) {
+        this.plunger = input.powerOverride;
+        this.powerParked = true;
+      } else if (input.plunge) {
+        this.powerParked = false;
+        this.plunger = Math.min(1, this.plunger + dt * 1.15);
+      } else if (this.prevPlunge && this.plunger > 0.05) {
         this.launch();
-      } else {
-        this.plunger = Math.max(0, this.plunger - dt * 2.2);
+      } else if (!this.powerParked) {
+        this.plunger = Math.max(0, this.plunger - dt * 1.6);
       }
     }
 
@@ -169,13 +175,14 @@ export class PinballGame {
 
   private launch(): void {
     if (!this.ball || this.phase !== "plunging") return;
-    const power = 0.28 + this.plunger * 0.72;
-    Body.setVelocity(this.ball, { x: 0.15, y: -18 - power * 16 });
+    const power = this.plunger;
+    Body.setVelocity(this.ball, { x: 0, y: -11 - power * 22 });
     Body.setPosition(this.ball, {
       x: this.table.launchSpawn.x,
       y: this.table.launchSpawn.y - 24,
     });
     this.plunger = 0;
+    this.powerParked = false;
     this.skillArmed = true;
     this.skillLane = Math.floor(Math.random() * 3);
     this.audio.plunge();
@@ -187,6 +194,7 @@ export class PinballGame {
     this.removeBall();
     this.openGate();
     this.plunger = 0;
+    this.powerParked = false;
     this.skillArmed = false;
     this.combo = 0;
     const spawn = this.table.launchSpawn;
@@ -222,6 +230,14 @@ export class PinballGame {
       this.closeGate();
     }
 
+    const inLane = ball.position.x > LANE_INNER - 2 && ball.position.x < LANE_OUTER + 8;
+    if (this.phase === "live" && inLane && ball.position.y < 350 && ball.velocity.y < -1) {
+      Body.setVelocity(ball, {
+        x: Math.min(ball.velocity.x, -10),
+        y: ball.velocity.y * 0.92,
+      });
+    }
+
     if (this.phase === "live" && ball.position.x > LANE_INNER + 8 && ball.position.y > 620 && ball.velocity.y > 2) {
       this.phase = "plunging";
       this.openGate();
@@ -255,6 +271,8 @@ export class PinballGame {
           this.onTarget(id);
         } else if (other.label.startsWith("flipper:")) {
           this.onFlipper(other);
+        } else if (other.label === "launch-turn") {
+          this.onLaunchTurn();
         } else if (other.label === "saucer") {
           this.onSaucer();
         } else if (other.label === "kick-target") {
@@ -345,6 +363,15 @@ export class PinballGame {
     Body.setVelocity(this.ball, {
       x: this.ball.velocity.x + inward + omega * 8,
       y: this.ball.velocity.y - Math.abs(omega) * 22,
+    });
+  }
+
+  private onLaunchTurn(): void {
+    if (!this.ball || this.phase !== "live") return;
+    if (this.ball.velocity.y >= 0) return;
+    Body.setVelocity(this.ball, {
+      x: -13,
+      y: Math.min(this.ball.velocity.y, -9),
     });
   }
 

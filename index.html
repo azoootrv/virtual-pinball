@@ -55,14 +55,21 @@
               <ul class="legend">
                 <li><kbd>Z</kbd> / <kbd>←</kbd> left flipper</li>
                 <li><kbd>X</kbd> / <kbd>→</kbd> right flipper</li>
-                <li><kbd>Space</kbd> or Plunge to launch</li>
+                <li><kbd>Space</kbd> hold to charge, release to launch</li>
               </ul>
             </div>
           </div>
         </div>
 
         <footer class="deck">
-          <p class="hint" id="hint">Hold Space or Plunge, then flip to keep the ball alive.</p>
+          <p class="hint" id="hint">Set launch power, then hold Plunge / Space and release to fire.</p>
+          <div class="power" id="power-bar">
+            <span>Power</span>
+            <div class="power-track" id="power-track" role="slider" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Launch power">
+              <div id="power-fill" class="power-fill"></div>
+            </div>
+            <strong id="power-pct">0%</strong>
+          </div>
           <div class="deck-row">
             <button type="button" id="mute-btn" class="ghost-btn" aria-pressed="false">
               Sound on

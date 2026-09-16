@@ -176,6 +176,21 @@ function drawPlunger(ctx: CanvasRenderingContext2D, pull: number, spawnX: number
   ctx.fillRect(spawnX - 7, top, 14, 960 - top);
   ctx.fillRect(spawnX - 11, top - 8, 22, 14);
   noGlow(ctx);
+
+  const meterX = spawnX + 18;
+  const meterY = 760;
+  const meterH = 180;
+  ctx.fillStyle = "#140814cc";
+  roundRect(ctx, meterX, meterY, 10, meterH, 4);
+  ctx.fill();
+  ctx.strokeStyle = "#ff2ec888";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  const fillH = meterH * pull;
+  glow(ctx, COLORS.magenta, 10);
+  ctx.fillStyle = pull > 0.8 ? COLORS.amber : COLORS.magenta;
+  ctx.fillRect(meterX + 1, meterY + meterH - fillH, 8, fillH);
+  noGlow(ctx);
 }
 
 export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void {

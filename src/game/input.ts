@@ -2,6 +2,7 @@ export class Input {
   left = false;
   right = false;
   plunge = false;
+  powerOverride: number | null = null;
   private startQueued = false;
 
   attach(root: Window | Document | HTMLElement): () => void {
@@ -111,6 +112,29 @@ export class Input {
       this.right = false;
       this.plunge = false;
     });
+  }
+
+  bindPowerBar(track: HTMLElement): void {
+    const valueFromEvent = (event: PointerEvent): number => {
+      const rect = track.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (event.clientX - rect.left) / Math.max(rect.width, 1)));
+    };
+    const start = (event: PointerEvent): void => {
+      event.preventDefault();
+      track.setPointerCapture(event.pointerId);
+      this.powerOverride = valueFromEvent(event);
+    };
+    const move = (event: PointerEvent): void => {
+      if (this.powerOverride === null) return;
+      this.powerOverride = valueFromEvent(event);
+    };
+    const end = (): void => {
+      this.powerOverride = null;
+    };
+    track.addEventListener("pointerdown", start);
+    track.addEventListener("pointermove", move);
+    track.addEventListener("pointerup", end);
+    track.addEventListener("pointercancel", end);
   }
 
   consumeStart(): boolean {

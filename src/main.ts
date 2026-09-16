@@ -20,6 +20,9 @@ const scoreEl = must(document.querySelector<HTMLElement>("#score"), "score");
 const highEl = must(document.querySelector<HTMLElement>("#high"), "high score");
 const ballsEl = must(document.querySelector<HTMLElement>("#balls"), "balls");
 const multEl = must(document.querySelector<HTMLElement>("#mult"), "multiplier");
+const powerFill = must(document.querySelector<HTMLElement>("#power-fill"), "power fill");
+const powerPct = must(document.querySelector<HTMLElement>("#power-pct"), "power percent");
+const powerTrack = must(document.querySelector<HTMLElement>("#power-track"), "power track");
 const ctx = must(canvas.getContext("2d"), "2d context");
 
 const game = new PinballGame();
@@ -34,19 +37,25 @@ const touchPlunge = document.querySelector<HTMLButtonElement>("#touch-plunge");
 if (touchLeft) input.bindHold(touchLeft, "left");
 if (touchRight) input.bindHold(touchRight, "right");
 if (touchPlunge) input.bindHold(touchPlunge, "plunge");
+input.bindPowerBar(powerTrack);
 
 function pad(value: number): string {
   return Math.max(0, Math.floor(value)).toString().padStart(7, "0");
 }
 
 function syncHud(): void {
-  if (!game.hudDirty) return;
   const hud = game.hud();
-  scoreEl.textContent = pad(hud.score);
-  highEl.textContent = pad(hud.high);
-  ballsEl.textContent = String(hud.balls);
-  multEl.textContent = `${hud.mult}×`;
-  game.hudDirty = false;
+  if (game.hudDirty) {
+    scoreEl.textContent = pad(hud.score);
+    highEl.textContent = pad(hud.high);
+    ballsEl.textContent = String(hud.balls);
+    multEl.textContent = `${hud.mult}×`;
+    game.hudDirty = false;
+  }
+  const pct = Math.round(hud.plunger * 100);
+  powerFill.style.width = `${pct}%`;
+  powerPct.textContent = `${pct}%`;
+  powerTrack.setAttribute("aria-valuenow", String(pct));
 }
 
 function setOverlay(mode: "attract" | "hidden" | "game-over", score = 0): void {
@@ -58,7 +67,7 @@ function setOverlay(mode: "attract" | "hidden" | "game-over", score = 0): void {
     overlayBody.textContent =
       "Charge the plunger, slap the flippers, and complete A-R-C for a hotter multiplier. Light the left bank to arm kickback.";
     startBtn.textContent = "Press Start";
-    hint.textContent = "Hold Space or Plunge, then flip to keep the ball alive.";
+    hint.textContent = "Drag the power bar or hold Plunge / Space, then release to launch.";
   }
   if (mode === "game-over") {
     overlayKicker.textContent = "Tilt-free finish";
