@@ -58,7 +58,7 @@ function setOverlay(mode: "attract" | "hidden" | "game-over", score = 0): void {
     overlayBody.textContent =
       "Charge the plunger, slap the flippers, and complete A-R-C for a hotter multiplier. Light the left bank to arm kickback.";
     startBtn.textContent = "Press Start";
-    hint.textContent = "Hold Space or the right launch lane, then flip to keep the ball alive.";
+    hint.textContent = "Hold Space or Plunge, then flip to keep the ball alive.";
   }
   if (mode === "game-over") {
     overlayKicker.textContent = "Tilt-free finish";

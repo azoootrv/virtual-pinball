@@ -57,12 +57,13 @@ body {
   display: grid;
   place-items: center;
   background: #050614;
+  container-type: size;
 }
 
 .playfield {
   position: relative;
-  height: 100%;
-  max-width: 100%;
+  width: min(100cqw, calc(100cqh * 668 / 1024));
+  height: min(100cqh, calc(100cqw * 1024 / 668));
   aspect-ratio: 668 / 1024;
 }
 
@@ -78,12 +79,12 @@ body {
 
 .hud {
   position: absolute;
-  top: 6.4%;
-  left: 8.2%;
-  right: 8.2%;
+  top: 6.15%;
+  left: 9%;
+  right: 8.4%;
   display: grid;
-  grid-template-columns: 1.35fr 1.35fr 0.7fr 0.7fr;
-  gap: 1.6%;
+  grid-template-columns: 1.32fr 1.32fr 0.68fr 0.72fr;
+  gap: 1.4%;
   pointer-events: none;
 }
 
@@ -211,15 +212,15 @@ kbd {
 }
 
 .deck {
-  padding: 8px 14px 12px;
+  padding: 6px 12px 8px;
   background: linear-gradient(180deg, #0b1020, #070814);
 }
 
 .hint {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   text-align: center;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .deck-row {
@@ -252,8 +253,8 @@ kbd {
 
 .flip-btn,
 .plunge-btn {
-  min-height: 48px;
-  border-radius: 12px;
+  min-height: 40px;
+  border-radius: 10px;
   color: #071018;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -266,6 +267,17 @@ kbd {
 .plunge-btn {
   background: var(--magenta);
   color: white;
+}
+
+@media (max-height: 820px) {
+  .hint,
+  .deck-row {
+    display: none;
+  }
+
+  .touch-pad {
+    margin-top: 0;
+  }
 }
 
 @media (max-width: 720px), (pointer: coarse) {
