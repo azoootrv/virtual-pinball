@@ -121,31 +121,73 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
   ctx.restore();
 }
 
+function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(92, 905);
+  ctx.lineTo(530, 905);
+  ctx.lineTo(530, 1010);
+  ctx.lineTo(92, 1010);
+  ctx.closePath();
+  ctx.clip();
+  const sky = ctx.createLinearGradient(0, 905, 0, 1010);
+  sky.addColorStop(0, "#040d22");
+  sky.addColorStop(0.5, "#050a1c");
+  sky.addColorStop(1, "#02060f");
+  ctx.fillStyle = sky;
+  ctx.fillRect(80, 900, 460, 120);
+  ctx.fillStyle = "#9fc0ff";
+  const stars: [number, number, number][] = [
+    [120, 920, 0.9], [160, 935, 0.6], [200, 918, 1.1], [250, 942, 0.7],
+    [300, 924, 0.9], [350, 940, 0.6], [400, 920, 1.0], [450, 936, 0.8],
+    [500, 922, 0.7], [140, 970, 0.8], [220, 985, 0.6], [300, 970, 1.0],
+    [380, 988, 0.7], [460, 972, 0.9], [180, 1000, 0.6], [340, 1002, 0.8],
+    [420, 998, 0.6], [110, 990, 0.7], [490, 992, 0.6],
+  ];
+  for (const [x, y, s] of stars) {
+    ctx.globalAlpha = 0.25 + s * 0.2;
+    ctx.beginPath();
+    ctx.arc(x, y, s, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  ctx.restore();
+}
+
 function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
-  if (Math.abs(flipper.body.angle - flipper.restAngle) < 0.05) return;
   const { body, length, width } = flipper;
   ctx.save();
   ctx.translate(body.position.x, body.position.y);
   ctx.rotate(body.angle);
   const hw = length / 2;
   const hh = width / 2;
+  glow(ctx, "#ff2ec8", 14);
   const shell = ctx.createLinearGradient(-hw, -hh, hw, hh);
-  shell.addColorStop(0, "#f4e8ef");
-  shell.addColorStop(0.5, "#d7c2cc");
-  shell.addColorStop(1, "#9a7b88");
+  shell.addColorStop(0, "#ff8fc0");
+  shell.addColorStop(0.5, "#d44a86");
+  shell.addColorStop(1, "#7a1f4a");
   ctx.fillStyle = shell;
   roundRect(ctx, -hw, -hh, length, width, hh);
   ctx.fill();
-  const core = ctx.createLinearGradient(-hw, 0, hw, 0);
-  core.addColorStop(0, "#fff6fb");
-  core.addColorStop(0.55, "#e8d4dc");
-  core.addColorStop(1, "#b08998");
+  noGlow(ctx);
+  const core = ctx.createLinearGradient(-hw, -hh, hw, hh);
+  core.addColorStop(0, "#fff4f9");
+  core.addColorStop(0.5, "#e2c8d2");
+  core.addColorStop(1, "#a86a7c");
   ctx.fillStyle = core;
   roundRect(ctx, -hw + 2, -hh + 3, length - 4, width - 6, hh - 3);
   ctx.fill();
-  ctx.fillStyle = "#2a1c22";
+  ctx.strokeStyle = "rgba(255,180,210,0.5)";
+  ctx.lineWidth = 1;
+  for (let i = -hw + 10; i < hw - 4; i += 7) {
+    ctx.beginPath();
+    ctx.moveTo(i, -hh + 3);
+    ctx.lineTo(i + 3, hh - 3);
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#2a0c16";
   ctx.beginPath();
-  ctx.arc(flipper.localPivotX, 0, 4, 0, Math.PI * 2);
+  ctx.arc(flipper.localPivotX, 0, 4.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
@@ -238,6 +280,7 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
   }
 
   drawPlunger(ctx, state.plunger, state.table.launchSpawn.x);
+  coverPaintedFlippers(ctx);
 
   if (state.ball) drawBall(ctx, state.ball.x, state.ball.y);
 
