@@ -79,7 +79,7 @@ export function wallSegment(
   return Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, len, thickness, {
     isStatic: true,
     angle: Math.atan2(dy, dx),
-    restitution: 0.32,
+    restitution: 0.5,
     friction: 0.02,
     label,
     chamfer: { radius: 1 },
@@ -360,7 +360,7 @@ export function buildTable(world: Matter.Composite): TableParts {
 export function makeBall(x: number, y: number): Matter.Body {
   return Bodies.circle(x, y, BALL_R, {
     label: "ball",
-    restitution: 0.42,
+    restitution: 0.55,
     friction: 0.01,
     frictionAir: 0.0012,
     density: 0.0022,

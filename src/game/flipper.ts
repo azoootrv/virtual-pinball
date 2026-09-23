@@ -128,14 +128,15 @@ export function separateBallFromFlipper(
   let vy = ball.velocity.y;
   const vn = vx * nx + vy * ny;
   if (vn < 0) {
-    const bounce = swinging && vn < -0.35 ? 0.5 : 0;
+    const impact = Math.min(1, -vn / 18);
+    const bounce = (swinging ? 0.55 : 0.42) + impact * 0.2;
     vx -= (1 + bounce) * vn * nx;
     vy -= (1 + bounce) * vn * ny;
   }
 
   if (!swinging) {
-    vx = vx * 0.985 + drain.x * 0.6;
-    vy = vy * 0.985 + drain.y * 0.6;
+    vx = vx * 0.992 + drain.x * 0.25;
+    vy = vy * 0.992 + drain.y * 0.25;
   } else if (swingUp) {
     const power = Math.min(1, Math.abs(omega) * 1.6);
     const launch = 20 + power * 30;
