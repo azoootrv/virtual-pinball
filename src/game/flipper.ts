@@ -133,9 +133,11 @@ export function separateBallFromFlipper(
   }
 
   if (surfaceN > 0.08) {
-    const kick = Math.min(18, 10 + Math.abs(omega) * 28);
-    vx += nx * kick * 0.22 + (flipper.side === "left" ? 2.1 : -2.1);
-    vy += ny * kick - Math.abs(omega) * 16;
+    const power = Math.min(1, Math.abs(omega) * 1.4);
+    const launch = 16 + power * 22;
+    vx += nx * launch * 0.5 + (flipper.side === "left" ? 3.2 : -3.2);
+    vy += ny * launch - 6;
+    if (vy > -launch * 0.6) vy = -launch * 0.6;
   }
 
   Body.setVelocity(ball, { x: vx, y: vy });

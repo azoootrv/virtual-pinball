@@ -108,7 +108,7 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 function makeFlipper(side: "left" | "right"): FlipperDef {
   const length = 126;
   const width = 24;
-  const pivot = side === "left" ? { x: 214, y: 940 } : { x: 416, y: 940 };
+  const pivot = side === "left" ? { x: 214, y: 962 } : { x: 416, y: 962 };
   const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
   const restAngle = side === "left" ? 0.42 : -0.42;
   const upAngle = side === "left" ? -0.7 : 0.7;
@@ -165,14 +165,14 @@ export const RIGHT_OUTLANE: [number, number][] = [
 
 export const LEFT_INLANE: [number, number][] = [
   [150, 760],
-  [188, 880],
-  [214, 940],
+  [188, 900],
+  [214, 962],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
-  [430, 880],
-  [416, 940],
+  [430, 900],
+  [416, 962],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -194,8 +194,8 @@ export function buildTable(world: Matter.Composite): TableParts {
     ...chainWalls(RIGHT_INLANE, 14),
     wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
-    wallSegment(90, 988, 292, 996, 16, "apron-left"),
-    wallSegment(338, 996, 530, 988, 16, "apron-right"),
+    wallSegment(90, 1004, 296, 1010, 16, "apron-left"),
+    wallSegment(334, 1010, 530, 1004, 16, "apron-right"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [
