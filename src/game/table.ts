@@ -106,12 +106,12 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 96;
-  const width = 24;
-  const pivot = side === "left" ? { x: 206, y: 948 } : { x: 424, y: 948 };
-  const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
-  const restAngle = side === "left" ? 0.72 : -0.72;
-  const upAngle = side === "left" ? -0.58 : 0.58;
+  const length = 100;
+  const width = 28;
+  const pivot = side === "left" ? { x: 198, y: 986 } : { x: 432, y: 986 };
+  const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
+  const restAngle = side === "left" ? 0.36 : -0.36;
+  const upAngle = side === "left" ? -0.7 : 0.7;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
@@ -165,14 +165,14 @@ export const RIGHT_OUTLANE: [number, number][] = [
 
 export const LEFT_INLANE: [number, number][] = [
   [150, 760],
-  [188, 890],
-  [206, 948],
+  [188, 900],
+  [198, 986],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
-  [430, 890],
-  [424, 948],
+  [430, 900],
+  [432, 986],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -194,6 +194,8 @@ export function buildTable(world: Matter.Composite): TableParts {
     ...chainWalls(RIGHT_INLANE, 14),
     wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
+    wallSegment(80, 1016, 278, 1018, 20, "apron-left"),
+    wallSegment(352, 1018, 540, 1016, 20, "apron-right"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [
@@ -286,14 +288,14 @@ export function buildTable(world: Matter.Composite): TableParts {
   const leftFlipper = makeFlipper("left");
   const rightFlipper = makeFlipper("right");
 
-  const drain = Bodies.rectangle(PLAY_CENTER, TABLE_H - 10, 250, 28, {
+  const drain = Bodies.rectangle(PLAY_CENTER, TABLE_H - 6, 72, 18, {
     isStatic: true,
     isSensor: true,
     label: "drain",
     collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
 
-  const kickZone = Bodies.rectangle(120, 940, 54, 48, {
+  const kickZone = Bodies.rectangle(120, 960, 54, 48, {
     isStatic: true,
     isSensor: true,
     label: "kickback-zone",

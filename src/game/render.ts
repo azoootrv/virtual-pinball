@@ -235,10 +235,11 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
   }
 
   drawPlunger(ctx, state.plunger, state.table.launchSpawn.x);
-  drawFlipper(ctx, state.table.leftFlipper);
-  drawFlipper(ctx, state.table.rightFlipper);
 
   if (state.ball) drawBall(ctx, state.ball.x, state.ball.y);
+
+  drawFlipper(ctx, state.table.leftFlipper);
+  drawFlipper(ctx, state.table.rightFlipper);
 
   for (const particle of state.particles) {
     ctx.globalAlpha = Math.max(0, particle.life);
