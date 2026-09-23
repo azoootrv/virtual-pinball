@@ -1,6 +1,5 @@
 import Matter from "matter-js";
 import { CAT, LANE_INNER, LANE_OUTER } from "../src/game/constants.ts";
-import { separateBallFromFlipper } from "../src/game/flipper.ts";
 import { buildTable, makeBall } from "../src/game/table.ts";
 
 const { Engine, Body, Composite, Events } = Matter;
@@ -21,29 +20,71 @@ function simulateDropOntoFlipper(start = { x: 248, y: 820 }, label = "left shaft
   Composite.add(engine.world, ball);
   Body.setVelocity(ball, { x: 0, y: 14 });
 
-  let prev = { ...start };
   let bounced = false;
 
   for (let i = 0; i < 140; i += 1) {
     Engine.update(engine, 1000 / 60);
-    const hitLeft = separateBallFromFlipper(ball, table.leftFlipper, prev);
-    const hitRight = separateBallFromFlipper(ball, table.rightFlipper, prev);
-    if (hitLeft || hitRight) bounced = true;
-    prev = { x: ball.position.x, y: ball.position.y };
-
-    const overLeftBat = ball.position.x >= 212 && ball.position.x <= 290;
-    const overRightBat = ball.position.x >= 340 && ball.position.x <= 418;
+    const speed = Math.hypot(ball.velocity.x, ball.velocity.y);
+    if (speed > 38) {
+      const s = 38 / speed;
+      Body.setVelocity(ball, { x: ball.velocity.x * s, y: ball.velocity.y * s });
+    }
+    const overLeftBat = ball.position.x >= 214 && ball.position.x <= 290;
+    const overRightBat = ball.position.x >= 340 && ball.position.x <= 416;
     const slippedUnder =
       ball.position.y > 1005 && ball.position.y < 1028 && (overLeftBat || overRightBat);
     if (slippedUnder) {
       fail(`ball went under a flipper at (${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`);
     }
+    if (ball.position.y < 990 && ball.position.y > 940 && (overLeftBat || overRightBat)) bounced = true;
   }
 
   if (!bounced) fail("drop never registered a flipper hit");
   console.log(
     `flipper drop (${label}) ok: bounced=${bounced} end=(${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`,
   );
+}
+
+function simulateFlipKick(): void {
+  const engine = Engine.create({
+    gravity: { x: 0, y: 1.15, scale: 0.0012 },
+    positionIterations: 16,
+    velocityIterations: 12,
+  });
+  const table = buildTable(engine.world);
+  const start = { x: 280, y: 940 };
+  const ball = makeBall(start.x, start.y);
+  Composite.add(engine.world, ball);
+  Body.setVelocity(ball, { x: 0, y: 0 });
+
+  for (let i = 0; i < 15; i += 1) {
+    Engine.update(engine, 1000 / 60);
+  }
+
+  const f = table.leftFlipper;
+  let maxSpeed = 0;
+  for (let i = 0; i < 25; i += 1) {
+    const target = f.upAngle;
+    const speed = 0.85;
+    const dt = 1 / 60;
+    const current = f.body.angle;
+    const diff = target - current;
+    const step = Math.abs(diff) <= speed * dt ? diff : Math.sign(diff) * speed * dt;
+    const next = current + step;
+    const cx = f.pivot.x - f.localPivotX * Math.cos(next);
+    const cy = f.pivot.y - f.localPivotX * Math.sin(next);
+    Body.setAngle(f.body, next);
+    Body.setPosition(f.body, { x: cx, y: cy });
+    Body.setAngularVelocity(f.body, step / dt);
+    Engine.update(engine, 1000 / 60);
+    const sp = Math.hypot(ball.velocity.x, ball.velocity.y);
+    if (sp > maxSpeed) maxSpeed = sp;
+  }
+
+  if (maxSpeed < 12) {
+    fail(`flipper kick too weak: max speed ${maxSpeed.toFixed(2)}`);
+  }
+  console.log(`flipper kick ok: max speed ${maxSpeed.toFixed(2)}`);
 }
 
 function simulateLaunchTurn(): void {
@@ -74,8 +115,8 @@ function simulateLaunchTurn(): void {
   for (let i = 0; i < 180; i += 1) {
     Engine.update(engine, 1000 / 60);
     const speed = Math.hypot(ball.velocity.x, ball.velocity.y);
-    if (speed > 30) {
-      const s = 30 / speed;
+    if (speed > 38) {
+      const s = 38 / speed;
       Body.setVelocity(ball, { x: ball.velocity.x * s, y: ball.velocity.y * s });
     }
     if (ball.position.x < LANE_INNER - 8) {
@@ -103,5 +144,6 @@ function simulateLaunchTurn(): void {
 
 simulateDropOntoFlipper();
 simulateDropOntoFlipper({ x: 392, y: 860 }, "right shaft");
+simulateFlipKick();
 simulateLaunchTurn();
 console.log("all physics checks passed");

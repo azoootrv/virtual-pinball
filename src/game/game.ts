@@ -1,7 +1,6 @@
 import Matter from "matter-js";
 import { TableAudio } from "./audio.ts";
 import {
-  BALL_R,
   BALLS_PER_GAME,
   CAT,
   COLORS,
@@ -14,7 +13,6 @@ import {
   TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
-import { closestOnSegment, flipperCapsule, separateBallFromFlipper } from "./flipper.ts";
 import { burst, tickFx, type Particle, type ScorePopup } from "./particles.ts";
 import { drawTable } from "./render.ts";
 import { buildTable, makeBall, type FlipperDef, type TableParts } from "./table.ts";
@@ -58,16 +56,12 @@ export class PinballGame {
   hudDirty = true;
 
   private ball: Matter.Body | null = null;
-  private prevBallX = 0;
-  private prevBallY = 0;
   private accumulator = 0;
   private combo = 0;
   private comboTimer = 0;
   private prevLeft = false;
   private prevRight = false;
   private prevPlunge = false;
-  private leftJustPressed = false;
-  private rightJustPressed = false;
   private waitTimer = 0;
 
   constructor() {
@@ -161,8 +155,6 @@ export class PinballGame {
   private handleInput(input: Input, dt: number): void {
     if (input.left && !this.prevLeft) this.audio.flip();
     if (input.right && !this.prevRight) this.audio.flip();
-    this.leftJustPressed = this.leftJustPressed || (input.left && !this.prevLeft);
-    this.rightJustPressed = this.rightJustPressed || (input.right && !this.prevRight);
 
     if (this.phase === "plunging" && this.ball) {
       if (input.powerOverride !== null) {
@@ -192,7 +184,6 @@ export class PinballGame {
       x: this.table.launchSpawn.x,
       y: this.table.launchSpawn.y - 24,
     });
-    this.rememberBall();
     this.plunger = 0;
     this.powerParked = false;
     this.skillArmed = true;
@@ -212,7 +203,6 @@ export class PinballGame {
     const spawn = this.table.launchSpawn;
     this.ball = makeBall(spawn.x, spawn.y);
     Composite.add(this.engine.world, this.ball);
-    this.rememberBall();
   }
 
   private parkDemoBall(): void {
@@ -230,47 +220,6 @@ export class PinballGame {
     moveFlipper(this.table.rightFlipper, input.right, dt);
   }
 
-  private rememberBall(): void {
-    if (!this.ball) return;
-    this.prevBallX = this.ball.position.x;
-    this.prevBallY = this.ball.position.y;
-  }
-
-  private applyFlipperKick(ball: Matter.Body): void {
-    const kick = (side: "left" | "right"): void => {
-      const flipper = side === "left" ? this.table.leftFlipper : this.table.rightFlipper;
-      const justPressed = side === "left" ? this.leftJustPressed : this.rightJustPressed;
-      if (!justPressed) return;
-      const cap = flipperCapsule(flipper);
-      const closest = closestOnSegment(ball.position.x, ball.position.y, cap.ax, cap.ay, cap.bx, cap.by);
-      const dist = Math.hypot(ball.position.x - closest.x, ball.position.y - closest.y);
-      if (dist > cap.radius + 52) return;
-      const angle = flipper.body.angle;
-      let nx = -Math.sin(angle);
-      let ny = Math.cos(angle);
-      if (ny > 0) {
-        nx = -nx;
-        ny = -ny;
-      }
-      const signed = (ball.position.x - closest.x) * nx + (ball.position.y - closest.y) * ny;
-      if (signed < -BALL_R * 0.5) return;
-      const launch = 38;
-      const inward = side === "left" ? 4.5 : -4.5;
-      Body.setPosition(ball, {
-        x: ball.position.x,
-        y: closest.y + ny * (cap.radius + 12),
-      });
-      Body.setVelocity(ball, {
-        x: ball.velocity.x * 0.25 + nx * launch + inward,
-        y: ball.velocity.y * 0.25 + ny * launch,
-      });
-    };
-    kick("left");
-    kick("right");
-    this.leftJustPressed = false;
-    this.rightJustPressed = false;
-  }
-
   private afterPhysics(): void {
     const ball = this.ball;
     if (!ball) return;
@@ -282,14 +231,6 @@ export class PinballGame {
     if (speed > maxSpeed) {
       Body.setVelocity(ball, Vector.mult(Vector.normalise(ball.velocity), maxSpeed));
     }
-
-    if (onPlayfield) {
-      const prev = { x: this.prevBallX, y: this.prevBallY };
-      separateBallFromFlipper(ball, this.table.leftFlipper, prev);
-      separateBallFromFlipper(ball, this.table.rightFlipper, prev);
-      this.applyFlipperKick(ball);
-    }
-    this.rememberBall();
 
     if (this.phase === "live" && ball.position.x < LANE_INNER - 8) {
       this.closeGate();
@@ -456,7 +397,6 @@ export class PinballGame {
     this.kickbackLit = false;
     Body.setVelocity(this.ball, { x: 4, y: -22 });
     Body.setPosition(this.ball, { x: 130, y: 860 });
-    this.rememberBall();
     this.addScore(1000, 130, 860);
     this.flash("KICKBACK");
     this.audio.kickback();
@@ -536,25 +476,15 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 90 : 34;
-  const body = flipper.body as Matter.Body & {
-    positionPrev: { x: number; y: number };
-    anglePrev: number;
-  };
+  const speed = pressed ? 0.85 : 0.4;
+  const body = flipper.body;
   const current = body.angle;
   const diff = target - current;
-  const maxStep = speed * dt;
-  const step = Math.abs(diff) <= maxStep ? diff : Math.sign(diff) * maxStep;
+  const step = Math.abs(diff) <= speed * dt ? diff : Math.sign(diff) * speed * dt;
   const next = current + step;
   const cx = flipper.pivot.x - flipper.localPivotX * Math.cos(next);
   const cy = flipper.pivot.y - flipper.localPivotX * Math.sin(next);
-  const prevX = body.position.x;
-  const prevY = body.position.y;
-  Body.setPosition(body, { x: cx, y: cy });
   Body.setAngle(body, next);
-  body.positionPrev.x = prevX;
-  body.positionPrev.y = prevY;
-  body.anglePrev = current;
-  Body.setVelocity(body, { x: cx - prevX, y: cy - prevY });
-  Body.setAngularVelocity(body, step);
+  Body.setPosition(body, { x: cx, y: cy });
+  Body.setAngularVelocity(body, step / dt);
 }

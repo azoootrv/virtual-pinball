@@ -9,7 +9,7 @@ import {
   TABLE_H,
 } from "./constants.ts";
 
-const { Bodies, Composite } = Matter;
+const { Bodies, Body, Composite } = Matter;
 
 export type BumperDef = {
   id: number;
@@ -106,8 +106,8 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 126;
-  const width = 24;
+  const length = 110;
+  const width = 22;
   const pivot = side === "left" ? { x: 214, y: 962 } : { x: 416, y: 962 };
   const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
   const restAngle = side === "left" ? 0.42 : -0.42;
@@ -116,16 +116,18 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
     angle: restAngle,
-    isStatic: true,
-    isSensor: true,
-    restitution: 0,
-    friction: 0,
-    slop: 0,
+    isStatic: false,
+    inertia: Infinity,
+    frictionAir: 0,
+    restitution: 0.35,
+    friction: 0.05,
+    slop: 0.02,
     label: `flipper:${side}`,
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
-  body.friction = 0;
-  body.restitution = 0;
+  Body.setStatic(body, true);
+  body.restitution = 0.35;
+  body.friction = 0.05;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
 
