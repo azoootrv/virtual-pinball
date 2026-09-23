@@ -24,7 +24,7 @@ export type Phase = "attract" | "plunging" | "live" | "ball-lost" | "game-over";
 const STEP = 1000 / 60;
 const MAX_BALL_SPEED = 38;
 const FLIPPER_ZONE_Y = 760;
-const FLIPPER_ZONE_SPEED = 22;
+const FLIPPER_ZONE_SPEED = 14;
 
 function readHighScore(): number {
   const raw = localStorage.getItem(HIGH_SCORE_KEY);
@@ -108,9 +108,13 @@ export class PinballGame {
     this.handleInput(input, dt);
     this.accumulator += Math.min(dtMs, 48);
     while (this.accumulator >= STEP) {
-      this.syncFlippers(STEP / 1000, input);
-      Engine.update(this.engine, STEP);
-      this.afterPhysics();
+      const subSteps = this.ball && this.ball.position.y > FLIPPER_ZONE_Y && this.ball.position.x < LANE_INNER ? 3 : 1;
+      const sub = STEP / subSteps;
+      for (let s = 0; s < subSteps; s += 1) {
+        this.syncFlippers(sub / 1000, input);
+        Engine.update(this.engine, sub);
+        this.afterPhysics();
+      }
       this.accumulator -= STEP;
     }
     this.decayFlashes(dt);

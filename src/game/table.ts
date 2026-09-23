@@ -106,10 +106,10 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 110;
-  const width = 22;
+  const length = 108;
+  const width = 26;
   const pivot = side === "left" ? { x: 214, y: 962 } : { x: 416, y: 962 };
-  const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
+  const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
   const restAngle = side === "left" ? 0.42 : -0.42;
   const upAngle = side === "left" ? -0.7 : 0.7;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
@@ -119,14 +119,15 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     isStatic: false,
     inertia: Infinity,
     frictionAir: 0,
-    restitution: 0.35,
+    restitution: 0.5,
     friction: 0.05,
     slop: 0.02,
+    chamfer: { radius: 6 },
     label: `flipper:${side}`,
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
   Body.setStatic(body, true);
-  body.restitution = 0.35;
+  body.restitution = 0.5;
   body.friction = 0.05;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
