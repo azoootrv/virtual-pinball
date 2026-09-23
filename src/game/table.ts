@@ -106,12 +106,12 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 }
 
 function makeFlipper(side: "left" | "right"): FlipperDef {
-  const length = 96;
-  const width = 22;
-  const pivot = side === "left" ? { x: 212, y: 942 } : { x: 418, y: 942 };
-  const localPivotX = side === "left" ? -(length / 2 - 11) : length / 2 - 11;
-  const restAngle = side === "left" ? 0.4 : -0.4;
-  const upAngle = side === "left" ? -0.68 : 0.68;
+  const length = 126;
+  const width = 24;
+  const pivot = side === "left" ? { x: 214, y: 940 } : { x: 416, y: 940 };
+  const localPivotX = side === "left" ? -(length / 2 - 12) : length / 2 - 12;
+  const restAngle = side === "left" ? 0.42 : -0.42;
+  const upAngle = side === "left" ? -0.7 : 0.7;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
   const body = Bodies.rectangle(cx, cy, length, width, {
@@ -166,13 +166,13 @@ export const RIGHT_OUTLANE: [number, number][] = [
 export const LEFT_INLANE: [number, number][] = [
   [150, 760],
   [188, 880],
-  [212, 942],
+  [214, 940],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
   [430, 880],
-  [418, 942],
+  [416, 940],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -288,7 +288,7 @@ export function buildTable(world: Matter.Composite): TableParts {
   const leftFlipper = makeFlipper("left");
   const rightFlipper = makeFlipper("right");
 
-  const drain = Bodies.rectangle(PLAY_CENTER, TABLE_H - 6, 72, 18, {
+  const drain = Bodies.rectangle(PLAY_CENTER, TABLE_H - 6, 22, 18, {
     isStatic: true,
     isSensor: true,
     label: "drain",
