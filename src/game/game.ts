@@ -1,6 +1,7 @@
 import Matter from "matter-js";
 import { TableAudio } from "./audio.ts";
 import {
+  BALL_R,
   BALLS_PER_GAME,
   CAT,
   COLORS,
@@ -251,6 +252,8 @@ export class PinballGame {
         nx = -nx;
         ny = -ny;
       }
+      const signed = (ball.position.x - closest.x) * nx + (ball.position.y - closest.y) * ny;
+      if (signed < -BALL_R * 0.5) return;
       const launch = 38;
       const inward = side === "left" ? 4.5 : -4.5;
       Body.setPosition(ball, {
