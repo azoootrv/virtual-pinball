@@ -165,9 +165,8 @@ export class PinballGame {
         this.powerParked = true;
       } else if (input.plunge) {
         this.powerParked = false;
-        this.plunger = Math.min(1, this.plunger + dt * 1.15);
+        this.plunger = Math.min(1, this.plunger + dt * 0.48);
       } else if (this.prevPlunge) {
-        if (this.plunger < 0.55) this.plunger = 0.72;
         this.launch();
       } else if (!this.powerParked) {
         this.plunger = Math.max(0, this.plunger - dt * 1.6);
@@ -181,8 +180,9 @@ export class PinballGame {
 
   private launch(): void {
     if (!this.ball || this.phase !== "plunging") return;
-    const power = this.plunger;
-    Body.setVelocity(this.ball, { x: 0, y: -11 - power * 22 });
+    const power = Math.max(0, Math.min(1, this.plunger));
+    const scaled = power ** 1.6;
+    Body.setVelocity(this.ball, { x: 0, y: -4.5 - scaled * 38 });
     Body.setPosition(this.ball, {
       x: this.table.launchSpawn.x,
       y: this.table.launchSpawn.y - 24,

@@ -31,10 +31,10 @@ function simulateDropOntoFlipper(start = { x: 248, y: 820 }, label = "left shaft
     if (hitLeft || hitRight) bounced = true;
     prev = { x: ball.position.x, y: ball.position.y };
 
-    const overLeftBat = ball.position.x >= 198 && ball.position.x <= 270;
-    const overRightBat = ball.position.x >= 360 && ball.position.x <= 432;
+    const overLeftBat = ball.position.x >= 212 && ball.position.x <= 290;
+    const overRightBat = ball.position.x >= 340 && ball.position.x <= 418;
     const slippedUnder =
-      ball.position.y > 1018 && ball.position.y < 1032 && (overLeftBat || overRightBat);
+      ball.position.y > 1005 && ball.position.y < 1028 && (overLeftBat || overRightBat);
     if (slippedUnder) {
       fail(`ball went under a flipper at (${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`);
     }

@@ -122,27 +122,30 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
 }
 
 function drawFlipper(ctx: CanvasRenderingContext2D, flipper: FlipperDef): void {
+  if (Math.abs(flipper.body.angle - flipper.restAngle) < 0.05) return;
   const { body, length, width } = flipper;
   ctx.save();
   ctx.translate(body.position.x, body.position.y);
   ctx.rotate(body.angle);
   const hw = length / 2;
   const hh = width / 2;
-  glow(ctx, COLORS.cyan, 20);
-  ctx.fillStyle = COLORS.cyan;
+  const shell = ctx.createLinearGradient(-hw, -hh, hw, hh);
+  shell.addColorStop(0, "#f4e8ef");
+  shell.addColorStop(0.5, "#d7c2cc");
+  shell.addColorStop(1, "#9a7b88");
+  ctx.fillStyle = shell;
   roundRect(ctx, -hw, -hh, length, width, hh);
   ctx.fill();
-  noGlow(ctx);
   const core = ctx.createLinearGradient(-hw, 0, hw, 0);
-  core.addColorStop(0, "#e7ffff");
-  core.addColorStop(0.45, "#7af6ff");
-  core.addColorStop(1, "#2a8ea8");
+  core.addColorStop(0, "#fff6fb");
+  core.addColorStop(0.55, "#e8d4dc");
+  core.addColorStop(1, "#b08998");
   ctx.fillStyle = core;
   roundRect(ctx, -hw + 2, -hh + 3, length - 4, width - 6, hh - 3);
   ctx.fill();
-  ctx.fillStyle = "#061018";
+  ctx.fillStyle = "#2a1c22";
   ctx.beginPath();
-  ctx.arc(flipper.localPivotX, 0, 5, 0, Math.PI * 2);
+  ctx.arc(flipper.localPivotX, 0, 4, 0, Math.PI * 2);
   ctx.fill();
   ctx.restore();
 }
