@@ -123,21 +123,27 @@ function drawTargetGlow(ctx: CanvasRenderingContext2D, target: TargetDef): void 
 
 function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
   ctx.save();
-  const cover = ctx.createRadialGradient(311, 980, 60, 311, 980, 230);
-  cover.addColorStop(0, "#040a1c");
-  cover.addColorStop(0.55, "rgba(5,10,28,0.92)");
-  cover.addColorStop(1, "rgba(5,10,28,0)");
+  const cx = 311;
+  const cy = 1000;
+  const R = 190;
+  const cover = ctx.createRadialGradient(cx, cy, 0, cx, cy, R);
+  cover.addColorStop(0, "rgba(6,14,34,0.86)");
+  cover.addColorStop(0.6, "rgba(5,10,26,0.6)");
+  cover.addColorStop(1, "rgba(5,10,26,0)");
   ctx.fillStyle = cover;
-  ctx.fillRect(60, 900, 500, 130);
-  ctx.fillStyle = "#9fc0ff";
+  ctx.fillRect(60, 810, 500, 214);
+  ctx.fillStyle = "#aec6ee";
   const stars: [number, number, number][] = [
-    [120, 950, 0.8], [170, 968, 0.6], [220, 956, 1.0], [270, 978, 0.7],
-    [320, 960, 0.9], [370, 984, 0.6], [420, 966, 1.0], [470, 980, 0.8],
-    [200, 998, 0.6], [300, 1000, 0.9], [400, 996, 0.7],
+    [150, 950, 0.9], [200, 972, 0.7], [250, 956, 1.1], [300, 978, 0.8],
+    [350, 960, 1.0], [400, 984, 0.7], [450, 966, 1.1], [500, 982, 0.9],
+    [180, 998, 0.7], [260, 1004, 1.0], [340, 1000, 0.8], [420, 1006, 0.9],
+    [120, 980, 0.6], [220, 940, 0.8], [320, 950, 0.7], [400, 942, 0.9],
+    [470, 950, 0.7], [510, 970, 0.8],
   ];
   for (const [x, y, s] of stars) {
-    const d = Math.hypot(x - 311, y - 980) / 230;
-    ctx.globalAlpha = (0.3 + s * 0.2) * Math.max(0, 1 - d);
+    const d = Math.hypot(x - cx, y - cy) / R;
+    if (d >= 1) continue;
+    ctx.globalAlpha = (0.35 + s * 0.25) * (1 - d);
     ctx.beginPath();
     ctx.arc(x, y, s, 0, Math.PI * 2);
     ctx.fill();
