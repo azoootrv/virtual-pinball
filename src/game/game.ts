@@ -23,9 +23,9 @@ const { Engine, Body, Composite, Events, Vector } = Matter;
 export type Phase = "attract" | "plunging" | "live" | "ball-lost" | "game-over";
 
 const STEP = 1000 / 60;
-const MAX_BALL_SPEED = 30;
+const MAX_BALL_SPEED = 38;
 const FLIPPER_ZONE_Y = 760;
-const FLIPPER_ZONE_SPEED = 16;
+const FLIPPER_ZONE_SPEED = 22;
 
 function readHighScore(): number {
   const raw = localStorage.getItem(HIGH_SCORE_KEY);
@@ -243,12 +243,23 @@ export class PinballGame {
       const cap = flipperCapsule(flipper);
       const closest = closestOnSegment(ball.position.x, ball.position.y, cap.ax, cap.ay, cap.bx, cap.by);
       const dist = Math.hypot(ball.position.x - closest.x, ball.position.y - closest.y);
-      if (dist > cap.radius + 46) return;
-      const inward = side === "left" ? 5.5 : -5.5;
-      Body.setPosition(ball, { x: ball.position.x, y: Math.min(ball.position.y, cap.ay - 26) });
+      if (dist > cap.radius + 52) return;
+      const angle = flipper.body.angle;
+      let nx = -Math.sin(angle);
+      let ny = Math.cos(angle);
+      if (ny > 0) {
+        nx = -nx;
+        ny = -ny;
+      }
+      const launch = 38;
+      const inward = side === "left" ? 4.5 : -4.5;
+      Body.setPosition(ball, {
+        x: ball.position.x,
+        y: closest.y + ny * (cap.radius + 12),
+      });
       Body.setVelocity(ball, {
-        x: ball.velocity.x * 0.4 + inward,
-        y: -30,
+        x: ball.velocity.x * 0.25 + nx * launch + inward,
+        y: ball.velocity.y * 0.25 + ny * launch,
       });
     };
     kick("left");
