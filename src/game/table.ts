@@ -216,10 +216,11 @@ export function buildTable(world: Matter.Composite): TableParts {
   });
 
   const targets: TargetDef[] = [0, 1, 2].map((id) => {
-    const body = Bodies.rectangle(98, 538 + id * 42, 12, 28, {
+    const body = Bodies.rectangle(112, 538 + id * 42, 12, 28, {
       isStatic: true,
       angle: 0.12,
-      restitution: 0.2,
+      restitution: 0.55,
+      friction: 0,
       label: `target:${id}`,
       collisionFilter: { category: CAT.table, mask: CAT.ball },
     });
@@ -227,10 +228,11 @@ export function buildTable(world: Matter.Composite): TableParts {
   });
 
   [0, 1, 2].forEach((id) => {
-    const body = Bodies.rectangle(520, 538 + id * 42, 12, 28, {
+    const body = Bodies.rectangle(508, 538 + id * 42, 12, 28, {
       isStatic: true,
       angle: -0.12,
-      restitution: 0.2,
+      restitution: 0.55,
+      friction: 0,
       label: id === 0 ? "kick-target" : `target:${id + 3}`,
       collisionFilter: { category: CAT.table, mask: CAT.ball },
     });
