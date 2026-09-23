@@ -522,7 +522,7 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 42 : 16;
+  const speed = pressed ? 90 : 34;
   const body = flipper.body as Matter.Body & {
     positionPrev: { x: number; y: number };
     anglePrev: number;
