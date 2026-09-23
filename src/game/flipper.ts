@@ -77,31 +77,37 @@ export function separateBallFromFlipper(
   const face = upwardNormal(flipper.body.angle);
   const swinging = Math.abs(flipper.body.angularVelocity) > 0.05;
 
+  const prevClose = closestOnSegment(prev.x, prev.y, cap.ax, cap.ay, cap.bx, cap.by);
+  const prevSigned = (prev.x - prevClose.x) * face.x + (prev.y - prevClose.y) * face.y;
+  const prevBelow = prevClose.t >= 0 && prevClose.t <= 1 && prevSigned < -BALL_R * 0.4;
+
   let bestT = 2;
   let cx = cap.ax;
   let cy = cap.ay;
   let along = 0;
-  let under = false;
 
   for (let i = 0; i <= samples; i += 1) {
     const t = i / samples;
     const px = prev.x + (ball.position.x - prev.x) * t;
     const py = prev.y + (ball.position.y - prev.y) * t;
     const closest = closestOnSegment(px, py, cap.ax, cap.ay, cap.bx, cap.by);
-    const tInner = flipper.side === "left" ? closest.t : 1 - closest.t;
     if (closest.t < 0 || closest.t > 1) continue;
     const dist = Math.hypot(px - closest.x, py - closest.y);
     if (dist >= hitRadius + 6) continue;
+    const signed = (px - closest.x) * face.x + (py - closest.y) * face.y;
+    if (signed < -BALL_R * 0.4) continue;
     if (t <= bestT) {
       bestT = t;
       cx = closest.x;
       cy = closest.y;
-      along = tInner;
-      under = (px - closest.x) * face.x + (py - closest.y) * face.y < 0;
+      along = flipper.side === "left" ? closest.t : 1 - closest.t;
     }
   }
 
-  if (bestT > 1) return false;
+  if (bestT > 1) {
+    if (prevBelow) return false;
+    return false;
+  }
 
   const inHole = !swinging && along > 0.97;
   if (inHole) return false;
@@ -119,7 +125,7 @@ export function separateBallFromFlipper(
   const surfaceN = -omega * ry * nx + omega * rx * ny;
 
   let vx = ball.velocity.x;
-  let vy = under ? Math.min(ball.velocity.y, 0) : ball.velocity.y;
+  let vy = ball.velocity.y;
   const vn = vx * nx + vy * ny;
   if (vn < 0) {
     const bounce = swinging && vn < -0.35 ? 0.42 : 0;
