@@ -13,7 +13,7 @@ import {
   TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
-import { separateBallFromFlipper } from "./flipper.ts";
+import { closestOnSegment, flipperCapsule, separateBallFromFlipper } from "./flipper.ts";
 import { burst, tickFx, type Particle, type ScorePopup } from "./particles.ts";
 import { drawTable } from "./render.ts";
 import { buildTable, makeBall, type FlipperDef, type TableParts } from "./table.ts";
@@ -65,6 +65,8 @@ export class PinballGame {
   private prevLeft = false;
   private prevRight = false;
   private prevPlunge = false;
+  private leftJustPressed = false;
+  private rightJustPressed = false;
   private waitTimer = 0;
 
   constructor() {
@@ -158,6 +160,8 @@ export class PinballGame {
   private handleInput(input: Input, dt: number): void {
     if (input.left && !this.prevLeft) this.audio.flip();
     if (input.right && !this.prevRight) this.audio.flip();
+    this.leftJustPressed = this.leftJustPressed || (input.left && !this.prevLeft);
+    this.rightJustPressed = this.rightJustPressed || (input.right && !this.prevRight);
 
     if (this.phase === "plunging" && this.ball) {
       if (input.powerOverride !== null) {
@@ -231,6 +235,28 @@ export class PinballGame {
     this.prevBallY = this.ball.position.y;
   }
 
+  private applyFlipperKick(ball: Matter.Body): void {
+    const kick = (side: "left" | "right"): void => {
+      const flipper = side === "left" ? this.table.leftFlipper : this.table.rightFlipper;
+      const justPressed = side === "left" ? this.leftJustPressed : this.rightJustPressed;
+      if (!justPressed) return;
+      const cap = flipperCapsule(flipper);
+      const closest = closestOnSegment(ball.position.x, ball.position.y, cap.ax, cap.ay, cap.bx, cap.by);
+      const dist = Math.hypot(ball.position.x - closest.x, ball.position.y - closest.y);
+      if (dist > cap.radius + 46) return;
+      const inward = side === "left" ? 5.5 : -5.5;
+      Body.setPosition(ball, { x: ball.position.x, y: Math.min(ball.position.y, cap.ay - 26) });
+      Body.setVelocity(ball, {
+        x: ball.velocity.x * 0.4 + inward,
+        y: -30,
+      });
+    };
+    kick("left");
+    kick("right");
+    this.leftJustPressed = false;
+    this.rightJustPressed = false;
+  }
+
   private afterPhysics(): void {
     const ball = this.ball;
     if (!ball) return;
@@ -247,6 +273,7 @@ export class PinballGame {
       const prev = { x: this.prevBallX, y: this.prevBallY };
       separateBallFromFlipper(ball, this.table.leftFlipper, prev);
       separateBallFromFlipper(ball, this.table.rightFlipper, prev);
+      this.applyFlipperKick(ball);
     }
     this.rememberBall();
 

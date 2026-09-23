@@ -27,7 +27,7 @@ export function flipperCapsule(flipper: FlipperDef): Capsule {
   };
 }
 
-function closestOnSegment(
+export function closestOnSegment(
   px: number,
   py: number,
   ax: number,
@@ -122,28 +122,27 @@ export function separateBallFromFlipper(
   const rx = cx - flipper.pivot.x;
   const ry = cy - flipper.pivot.y;
   const omega = flipper.body.angularVelocity;
-  const surfaceN = -omega * ry * nx + omega * rx * ny;
+  const swingUp = omega * (rx * ny - ry * nx) > 0;
 
   let vx = ball.velocity.x;
   let vy = ball.velocity.y;
   const vn = vx * nx + vy * ny;
   if (vn < 0) {
-    const bounce = swinging && vn < -0.35 ? 0.42 : 0;
+    const bounce = swinging && vn < -0.35 ? 0.5 : 0;
     vx -= (1 + bounce) * vn * nx;
     vy -= (1 + bounce) * vn * ny;
   }
 
   if (!swinging) {
-    vx = vx * 0.9 + drain.x * 0.35;
-    vy = vy * 0.9 + drain.y * 0.35;
-  }
-
-  if (surfaceN > 0.08) {
-    const power = Math.min(1, Math.abs(omega) * 1.4);
-    const launch = 16 + power * 22;
-    vx += nx * launch * 0.5 + (flipper.side === "left" ? 3.2 : -3.2);
-    vy += ny * launch - 6;
-    if (vy > -launch * 0.6) vy = -launch * 0.6;
+    vx = vx * 0.985 + drain.x * 0.6;
+    vy = vy * 0.985 + drain.y * 0.6;
+  } else if (swingUp) {
+    const power = Math.min(1, Math.abs(omega) * 1.6);
+    const launch = 20 + power * 30;
+    const inward = flipper.side === "left" ? 1 : -1;
+    vx = vx * 0.5 + nx * launch * 0.6 + inward * 4;
+    vy = vy * 0.4 + ny * launch - 4;
+    if (vy > -launch * 0.75) vy = -launch * 0.75;
   }
 
   Body.setVelocity(ball, { x: vx, y: vy });
