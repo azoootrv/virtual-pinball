@@ -13,10 +13,10 @@ function drop(sx: number, sy: number, vx = number, vy = number): { stuck: number
   let drained = false;
   for (let i = 0; i < 300; i += 1) {
     for (let s = 0; s < 3; s += 1) Engine.update(engine, 1000 / 180);
-    if (ball.position.y > 968) { drained = true; break; }
+    if (ball.position.y > 996) { drained = true; break; }
     const sp = Math.hypot(ball.velocity.x, ball.velocity.y);
     if (sp > 14) { const k = 14 / sp; Body.setVelocity(ball, { x: ball.velocity.x * k, y: ball.velocity.y * k }); }
-    if (sp < 0.4 && ball.position.y > 968 && ball.position.y < 1024) stuck += 1;
+    if (sp < 0.4 && ball.position.y > 968 && ball.position.y < 996) stuck += 1;
   }
   return { stuck, x: ball.position.x, y: ball.position.y, drained };
 }

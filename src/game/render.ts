@@ -134,11 +134,11 @@ function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
   ctx.fillRect(60, 810, 500, 214);
   ctx.fillStyle = "#aec6ee";
   const stars: [number, number, number][] = [
-    [150, 978, 0.9], [200, 1000, 0.7], [250, 984, 1.1], [300, 1006, 0.8],
-    [350, 988, 1.0], [400, 1012, 0.7], [450, 994, 1.1], [500, 1010, 0.9],
-    [180, 1026, 0.7], [260, 1032, 1.0], [340, 1028, 0.8], [420, 1034, 0.9],
-    [120, 1008, 0.6], [220, 968, 0.8], [320, 978, 0.7], [400, 970, 0.9],
-    [470, 978, 0.7], [510, 998, 0.8],
+    [150, 974, 0.9], [200, 996, 0.7], [250, 980, 1.1], [300, 1002, 0.8],
+    [350, 984, 1.0], [400, 1008, 0.7], [450, 990, 1.1], [500, 1006, 0.9],
+    [180, 1022, 0.7], [260, 1028, 1.0], [340, 1024, 0.8], [420, 1030, 0.9],
+    [120, 1004, 0.6], [220, 964, 0.8], [320, 974, 0.7], [400, 966, 0.9],
+    [470, 974, 0.7], [510, 994, 0.8],
   ];
   for (const [x, y, s] of stars) {
     const d = Math.hypot(x - cx, y - cy) / R;
@@ -216,7 +216,7 @@ function drawPlunger(ctx: CanvasRenderingContext2D, pull: number, spawnX: number
   const top = 780 + pull * 100;
   glow(ctx, COLORS.magenta, 12);
   ctx.fillStyle = COLORS.magenta;
-  ctx.fillRect(spawnX - 7, top, 14, 960 - top);
+  ctx.fillRect(spawnX - 7, top, 14, 918 - top);
   ctx.fillRect(spawnX - 11, top - 8, 22, 14);
   noGlow(ctx);
 
@@ -273,7 +273,7 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
     ctx.fillStyle = COLORS.lime;
     ctx.font = "700 11px Orbitron, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("KICKBACK", 126, 946);
+    ctx.fillText("KICKBACK", 126, 974);
     noGlow(ctx);
   }
 

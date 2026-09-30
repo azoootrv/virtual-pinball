@@ -107,7 +107,7 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 function makeFlipper(side: "left" | "right"): FlipperDef {
   const length = 108;
   const width = 26;
-  const pivot = side === "left" ? { x: 214, y: 920 } : { x: 416, y: 920 };
+  const pivot = side === "left" ? { x: 214, y: 948 } : { x: 416, y: 948 };
   const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
   const restAngle = side === "left" ? 0.55 : -0.55;
   const upAngle = side === "left" ? -0.7 : 0.7;
@@ -165,16 +165,16 @@ export const RIGHT_OUTLANE: [number, number][] = [
 
 export const LEFT_INLANE: [number, number][] = [
   [150, 760],
-  [188, 858],
-  [206, 910],
-  [214, 920],
+  [188, 886],
+  [206, 938],
+  [214, 948],
 ];
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
-  [430, 858],
-  [424, 910],
-  [416, 920],
+  [430, 886],
+  [424, 938],
+  [416, 948],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -196,8 +196,8 @@ export function buildTable(world: Matter.Composite): TableParts {
     ...chainWalls(RIGHT_INLANE, 14),
     wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
-    wallSegment(90, 942, 296, 1006, 16, "apron-left"),
-    wallSegment(334, 1006, 530, 942, 16, "apron-right"),
+    wallSegment(90, 970, 296, 1034, 16, "apron-left"),
+    wallSegment(334, 1034, 530, 970, 16, "apron-right"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [
@@ -292,14 +292,14 @@ export function buildTable(world: Matter.Composite): TableParts {
   const leftFlipper = makeFlipper("left");
   const rightFlipper = makeFlipper("right");
 
-  const drain = Bodies.rectangle(PLAY_CENTER, 980, 240, 24, {
+  const drain = Bodies.rectangle(PLAY_CENTER, 1008, 240, 24, {
     isStatic: true,
     isSensor: true,
     label: "drain",
     collisionFilter: { category: CAT.table, mask: CAT.ball },
   });
 
-  const kickZone = Bodies.rectangle(120, 918, 54, 48, {
+  const kickZone = Bodies.rectangle(120, 974, 54, 48, {
     isStatic: true,
     isSensor: true,
     label: "kickback-zone",
