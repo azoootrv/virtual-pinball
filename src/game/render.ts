@@ -134,11 +134,11 @@ function coverPaintedFlippers(ctx: CanvasRenderingContext2D): void {
   ctx.fillRect(60, 810, 500, 214);
   ctx.fillStyle = "#aec6ee";
   const stars: [number, number, number][] = [
-    [150, 950, 0.9], [200, 972, 0.7], [250, 956, 1.1], [300, 978, 0.8],
-    [350, 960, 1.0], [400, 984, 0.7], [450, 966, 1.1], [500, 982, 0.9],
-    [180, 998, 0.7], [260, 1004, 1.0], [340, 1000, 0.8], [420, 1006, 0.9],
-    [120, 980, 0.6], [220, 940, 0.8], [320, 950, 0.7], [400, 942, 0.9],
-    [470, 950, 0.7], [510, 970, 0.8],
+    [150, 978, 0.9], [200, 1000, 0.7], [250, 984, 1.1], [300, 1006, 0.8],
+    [350, 988, 1.0], [400, 1012, 0.7], [450, 994, 1.1], [500, 1010, 0.9],
+    [180, 1026, 0.7], [260, 1032, 1.0], [340, 1028, 0.8], [420, 1034, 0.9],
+    [120, 1008, 0.6], [220, 968, 0.8], [320, 978, 0.7], [400, 970, 0.9],
+    [470, 978, 0.7], [510, 998, 0.8],
   ];
   for (const [x, y, s] of stars) {
     const d = Math.hypot(x - cx, y - cy) / R;
@@ -273,7 +273,7 @@ export function drawTable(ctx: CanvasRenderingContext2D, state: DrawState): void
     ctx.fillStyle = COLORS.lime;
     ctx.font = "700 11px Orbitron, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("KICKBACK", 126, 918);
+    ctx.fillText("KICKBACK", 126, 946);
     noGlow(ctx);
   }
 

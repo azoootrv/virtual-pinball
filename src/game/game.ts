@@ -414,7 +414,7 @@ export class PinballGame {
       return;
     }
     if (this.phase !== "live" && this.phase !== "plunging") return;
-    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 960, COLORS.drain, 18, 4);
+    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 988, COLORS.drain, 18, 4);
     this.audio.drain();
     this.removeBall();
     this.openGate();
