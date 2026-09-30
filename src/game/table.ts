@@ -197,8 +197,8 @@ export function buildTable(world: Matter.Composite): TableParts {
     ...chainWalls(RIGHT_INLANE, 14),
     wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
-    wallSegment(90, 962, 296, 968, 16, "apron-left"),
-    wallSegment(334, 968, 530, 962, 16, "apron-right"),
+    wallSegment(90, 942, 296, 1006, 16, "apron-left"),
+    wallSegment(334, 1006, 530, 942, 16, "apron-right"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [
