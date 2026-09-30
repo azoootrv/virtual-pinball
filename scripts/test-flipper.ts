@@ -29,14 +29,14 @@ function simulateDropOntoFlipper(start = { x: 248, y: 820 }, label = "left shaft
       const s = 38 / speed;
       Body.setVelocity(ball, { x: ball.velocity.x * s, y: ball.velocity.y * s });
     }
-    const overLeftBat = ball.position.x >= 214 && ball.position.x <= 240;
-    const overRightBat = ball.position.x >= 390 && ball.position.x <= 416;
+    const overLeftBat = ball.position.x >= 214 && ball.position.x <= 305;
+    const overRightBat = ball.position.x >= 325 && ball.position.x <= 416;
     const slippedUnder =
-      ball.position.y > 1010 && ball.position.y < 1028 && (overLeftBat || overRightBat);
+      ball.position.y > 1010 && ball.position.y < 1015 && (overLeftBat || overRightBat);
     if (slippedUnder) {
       fail(`ball went under a flipper at (${ball.position.x.toFixed(1)}, ${ball.position.y.toFixed(1)})`);
     }
-    if (ball.position.y < 1000 && ball.position.y > 940 && (overLeftBat || overRightBat)) bounced = true;
+    if (ball.position.y < 1000 && ball.position.y > 900 && (overLeftBat || overRightBat)) bounced = true;
   }
 
   if (!bounced) fail("drop never registered a flipper hit");

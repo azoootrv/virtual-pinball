@@ -414,7 +414,7 @@ export class PinballGame {
       return;
     }
     if (this.phase !== "live" && this.phase !== "plunging") return;
-    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 988, COLORS.drain, 18, 4);
+    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 918, COLORS.drain, 18, 4);
     this.audio.drain();
     this.removeBall();
     this.openGate();
@@ -481,7 +481,7 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 6.5 : 3.2;
+  const speed = pressed ? 11 : 4;
   const body = flipper.body;
   const current = body.angle;
   const diff = target - current;
