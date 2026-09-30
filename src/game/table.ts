@@ -144,23 +144,14 @@ export const OUTER_WALL: [number, number][] = [
   [580, 188],
   [LANE_OUTER, 240],
   [LANE_OUTER, 960],
+  [530, 1010],
+  [309, 1018],
+  [90, 1010],
 ];
 
 export const LAUNCH_INNER: [number, number][] = [
   [LANE_INNER, 360],
   [LANE_INNER, 960],
-];
-
-export const LEFT_OUTLANE: [number, number][] = [
-  [LEFT, 720],
-  [92, 830],
-  [92, 1020],
-];
-
-export const RIGHT_OUTLANE: [number, number][] = [
-  [LANE_INNER, 720],
-  [526, 830],
-  [526, 1020],
 ];
 
 export const LEFT_INLANE: [number, number][] = [
@@ -181,8 +172,6 @@ export function buildTable(world: Matter.Composite): TableParts {
   const wallChains: TableParts["wallChains"] = [
     { pts: OUTER_WALL, color: "#3dfff8" },
     { pts: LAUNCH_INNER, color: "#ff2ec8" },
-    { pts: LEFT_OUTLANE, color: "#3dfff8" },
-    { pts: RIGHT_OUTLANE, color: "#3dfff8" },
     { pts: LEFT_INLANE, color: "#3dfff8" },
     { pts: RIGHT_INLANE, color: "#3dfff8" },
   ];
@@ -190,14 +179,14 @@ export function buildTable(world: Matter.Composite): TableParts {
   const walls = [
     ...chainWalls(OUTER_WALL, 18),
     ...chainWalls(LAUNCH_INNER, 12, "launch-inner"),
-    ...chainWalls(LEFT_OUTLANE, 16),
-    ...chainWalls(RIGHT_OUTLANE, 16),
     ...chainWalls(LEFT_INLANE, 14),
     ...chainWalls(RIGHT_INLANE, 14),
     wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
-    wallSegment(90, 970, 296, 1034, 16, "apron-left"),
-    wallSegment(334, 1034, 530, 970, 16, "apron-right"),
+    wallSegment(90, 1010, 200, 1018, 16, "apron-left"),
+    wallSegment(530, 1010, 420, 1018, 16, "apron-right"),
+    wallSegment(200, 1018, 318, 1018, 12, "drain-lip"),
+    wallSegment(420, 1018, 318, 1018, 12, "drain-lip"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [

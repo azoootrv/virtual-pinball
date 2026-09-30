@@ -9,7 +9,6 @@ import {
   LANE_INNER,
   LANE_OUTER,
   PLAY_CENTER,
-  TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
 import { burst, tickFx, type Particle, type ScorePopup } from "./particles.ts";
@@ -255,7 +254,7 @@ export class PinballGame {
       this.flash("RE-PLUNGE");
     }
 
-    if (ball.position.y > 968 || ball.position.x < -40 || ball.position.x > TABLE_W + 40) {
+    if (ball.position.y > 968) {
       this.onDrain();
     }
   }

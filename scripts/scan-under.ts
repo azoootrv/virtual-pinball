@@ -16,7 +16,7 @@ function drop(sx: number, sy: number, vx = number, vy = number): { stuck: number
     if (ball.position.y > 996) { drained = true; break; }
     const sp = Math.hypot(ball.velocity.x, ball.velocity.y);
     if (sp > 14) { const k = 14 / sp; Body.setVelocity(ball, { x: ball.velocity.x * k, y: ball.velocity.y * k }); }
-    if (sp < 0.4 && ball.position.y > 968 && ball.position.y < 996) stuck += 1;
+    if (sp < 0.4 && ball.position.y > 968) stuck += 1;
   }
   return { stuck, x: ball.position.x, y: ball.position.y, drained };
 }
