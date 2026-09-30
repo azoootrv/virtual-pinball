@@ -78,7 +78,7 @@ export function wallSegment(
   return Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, len, thickness, {
     isStatic: true,
     angle: Math.atan2(dy, dx),
-    restitution: 0.3,
+    restitution: 0.7,
     friction: 0,
     label,
     chamfer: { radius: 1 },
@@ -107,7 +107,7 @@ function post(x: number, y: number, r = 8, label = "post"): Matter.Body {
 function makeFlipper(side: "left" | "right"): FlipperDef {
   const length = 108;
   const width = 26;
-  const pivot = side === "left" ? { x: 214, y: 948 } : { x: 416, y: 948 };
+  const pivot = side === "left" ? { x: 214, y: 948 } : { x: 404, y: 948 };
   const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
   const restAngle = side === "left" ? 0.55 : -0.55;
   const upAngle = side === "left" ? -0.7 : 0.7;
@@ -145,7 +145,9 @@ export const OUTER_WALL: [number, number][] = [
   [LANE_OUTER, 240],
   [LANE_OUTER, 960],
   [530, 1010],
+  [518, 1018],
   [309, 1018],
+  [404, 1010],
   [90, 1010],
 ];
 
@@ -165,7 +167,7 @@ export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
   [430, 886],
   [424, 938],
-  [416, 948],
+  [404, 948],
 ];
 
 export function buildTable(world: Matter.Composite): TableParts {
@@ -177,16 +179,16 @@ export function buildTable(world: Matter.Composite): TableParts {
   ];
 
   const walls = [
-    ...chainWalls(OUTER_WALL, 18),
-    ...chainWalls(LAUNCH_INNER, 12, "launch-inner"),
-    ...chainWalls(LEFT_INLANE, 14),
-    ...chainWalls(RIGHT_INLANE, 14),
-    wallSegment(LEFT - 6, 132, 530, 132, 16, "top-roof"),
+    ...chainWalls(OUTER_WALL, 40),
+    ...chainWalls(LAUNCH_INNER, 24, "launch-inner"),
+    ...chainWalls(LEFT_INLANE, 28),
+    ...chainWalls(RIGHT_INLANE, 28),
+    wallSegment(LEFT - 6, 132, 530, 132, 200, "top-roof"),
     wallSegment(LANE_INNER + 4, 958, LANE_OUTER - 4, 958, 22, "lane-floor"),
-    wallSegment(90, 1010, 200, 1018, 16, "apron-left"),
-    wallSegment(530, 1010, 420, 1018, 16, "apron-right"),
-    wallSegment(200, 1018, 318, 1018, 12, "drain-lip"),
-    wallSegment(420, 1018, 318, 1018, 12, "drain-lip"),
+    wallSegment(90, 1010, 200, 1018, 40, "apron-left"),
+    wallSegment(518, 1010, 420, 1018, 40, "apron-right"),
+    wallSegment(200, 1018, 318, 1018, 40, "drain-lip"),
+    wallSegment(420, 1018, 318, 1018, 40, "drain-lip"),
   ];
 
   const bumperSpecs: { x: number; y: number; color: string }[] = [

@@ -8,6 +8,7 @@ import {
   HIGH_SCORE_KEY,
   LANE_INNER,
   LANE_OUTER,
+  LEFT,
   PLAY_CENTER,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
@@ -22,7 +23,7 @@ export type Phase = "attract" | "plunging" | "live" | "ball-lost" | "game-over";
 const STEP = 1000 / 60;
 const MAX_BALL_SPEED = 38;
 const FLIPPER_ZONE_Y = 760;
-const FLIPPER_ZONE_SPEED = 14;
+const FLIPPER_ZONE_SPEED = 42;
 
 function readHighScore(): number {
   const raw = localStorage.getItem(HIGH_SCORE_KEY);
@@ -107,11 +108,16 @@ export class PinballGame {
     this.handleInput(input, dt);
     this.accumulator += Math.min(dtMs, 48);
     while (this.accumulator >= STEP) {
-      const subSteps = this.ball && this.ball.position.y > 900 ? 6 : 1;
+      let subSteps = 1;
+      if (this.ball) {
+        if (this.ball.position.y < 350 && this.ball.velocity.y < -20) subSteps = 24;
+        else if (this.ball.position.y > 900) subSteps = 6;
+      }
       const sub = STEP / subSteps;
       for (let s = 0; s < subSteps; s += 1) {
         this.syncFlippers(sub / 1000, input);
         Engine.update(this.engine, sub);
+        this.clampBallVelocity();
         this.afterPhysics();
       }
       this.accumulator -= STEP;
@@ -221,6 +227,39 @@ export class PinballGame {
   private syncFlippers(dt: number, input: Input): void {
     moveFlipper(this.table.leftFlipper, input.left, dt);
     moveFlipper(this.table.rightFlipper, input.right, dt);
+    this.clampFlipperLaunch(this.table.leftFlipper);
+    this.clampFlipperLaunch(this.table.rightFlipper);
+  }
+
+  private clampFlipperLaunch(flipper: FlipperDef): void {
+    const ball = this.ball;
+    if (!ball || this.phase !== "live") return;
+    const body = flipper.body;
+    const dx = ball.position.x - body.position.x;
+    const dy = ball.position.y - body.position.y;
+    const cos = Math.cos(body.angle);
+    const sin = Math.sin(body.angle);
+    const localX = dx * cos + dy * sin;
+    const localY = -dx * sin + dy * cos;
+    const hw = flipper.length / 2;
+    const hh = flipper.width / 2;
+    if (Math.abs(localX) > hw + 14 || Math.abs(localY) > hh + 14) return;
+    const maxLaunch = 44;
+    const v = ball.velocity;
+    const speed = Math.hypot(v.x, v.y);
+    if (speed > maxLaunch && v.y < 0) {
+      const clamp = maxLaunch / speed;
+      Body.setVelocity(ball, { x: v.x * clamp, y: v.y * clamp });
+    }
+  }
+
+  private clampBallVelocity(): void {
+    const ball = this.ball;
+    if (!ball) return;
+    const v = ball.velocity;
+    if (v.y < -42) {
+      Body.setVelocity(ball, { x: v.x, y: -42 });
+    }
   }
 
   private afterPhysics(): void {
@@ -257,6 +296,17 @@ export class PinballGame {
     if (ball.position.y > 968) {
       this.onDrain();
     }
+
+    if (ball.position.x <= LEFT) {
+      console.log(`SIDE CLAMP: x=${ball.position.x.toFixed(1)} -> LEFT, vx=${ball.velocity.x.toFixed(1)}`);
+      Body.setPosition(ball, { x: LEFT, y: ball.position.y });
+      Body.setVelocity(ball, { x: Math.abs(ball.velocity.x) * 0.7, y: ball.velocity.y });
+    }
+    if (ball.position.x >= LANE_OUTER) {
+      console.log(`SIDE CLAMP: x=${ball.position.x.toFixed(1)} -> LANE_OUTER, vx=${ball.velocity.x.toFixed(1)}`);
+      Body.setPosition(ball, { x: LANE_OUTER, y: ball.position.y });
+      Body.setVelocity(ball, { x: -Math.abs(ball.velocity.x) * 0.7, y: ball.velocity.y });
+    }
   }
 
   private bindCollisions(): void {
@@ -278,6 +328,8 @@ export class PinballGame {
         } else if (other.label.startsWith("target:")) {
           const id = Number(other.label.split(":")[1]);
           this.onTarget(id);
+        } else if (other.label.startsWith("flipper:")) {
+          this.onFlipperHit();
         } else if (other.label === "launch-turn") {
           this.onLaunchTurn();
         } else if (other.label === "saucer") {
@@ -306,6 +358,18 @@ export class PinballGame {
     burst(this.particles, bumper.body.position.x, bumper.body.position.y, bumper.color, 16, 5);
     this.audio.bumper();
     this.skillArmed = false;
+  }
+
+  private onFlipperHit(): void {
+    if (!this.ball || this.phase !== "live") return;
+    const ball = this.ball;
+    const maxLaunch = 44;
+    const v = ball.velocity;
+    if (v.y < 0) {
+      const sp = Math.hypot(v.x, v.y);
+      const clamp = maxLaunch / sp;
+      Body.setVelocity(ball, { x: v.x * clamp, y: v.y * clamp });
+    }
   }
 
   private onSling(side: "left" | "right"): void {
@@ -479,7 +543,7 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 14 : 5;
+  const speed = pressed ? 12 : 4;
   const body = flipper.body;
   const current = body.angle;
   const diff = target - current;
