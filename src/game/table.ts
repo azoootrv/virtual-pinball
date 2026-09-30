@@ -119,7 +119,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     isStatic: false,
     inertia: Infinity,
     frictionAir: 0,
-    restitution: 0.5,
+    restitution: 0.7,
     friction: 0.05,
     slop: 0.02,
     chamfer: { radius: 6 },
@@ -127,7 +127,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
   Body.setStatic(body, true);
-  body.restitution = 0.5;
+  body.restitution = 0.7;
   body.friction = 0.05;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
