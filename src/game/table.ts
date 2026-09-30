@@ -6,7 +6,6 @@ import {
   LANE_OUTER,
   LEFT,
   PLAY_CENTER,
-  TABLE_H,
 } from "./constants.ts";
 
 const { Bodies, Body, Composite } = Matter;
@@ -293,7 +292,7 @@ export function buildTable(world: Matter.Composite): TableParts {
   const leftFlipper = makeFlipper("left");
   const rightFlipper = makeFlipper("right");
 
-  const drain = Bodies.rectangle(PLAY_CENTER, TABLE_H - 6, 22, 18, {
+  const drain = Bodies.rectangle(PLAY_CENTER, 980, 240, 24, {
     isStatic: true,
     isSensor: true,
     label: "drain",

@@ -9,7 +9,6 @@ import {
   LANE_INNER,
   LANE_OUTER,
   PLAY_CENTER,
-  TABLE_H,
   TABLE_W,
 } from "./constants.ts";
 import type { Input } from "./input.ts";
@@ -256,7 +255,7 @@ export class PinballGame {
       this.flash("RE-PLUNGE");
     }
 
-    if (ball.position.y > TABLE_H - 12 || ball.position.x < -40 || ball.position.x > TABLE_W + 40) {
+    if (ball.position.y > 968 || ball.position.x < -40 || ball.position.x > TABLE_W + 40) {
       this.onDrain();
     }
   }
@@ -414,7 +413,7 @@ export class PinballGame {
       return;
     }
     if (this.phase !== "live" && this.phase !== "plunging") return;
-    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 918, COLORS.drain, 18, 4);
+    burst(this.particles, this.ball?.position.x ?? PLAY_CENTER, 968, COLORS.drain, 18, 4);
     this.audio.drain();
     this.removeBall();
     this.openGate();
