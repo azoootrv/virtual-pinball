@@ -108,7 +108,7 @@ export class PinballGame {
     this.handleInput(input, dt);
     this.accumulator += Math.min(dtMs, 48);
     while (this.accumulator >= STEP) {
-      const subSteps = this.ball && this.ball.position.y > FLIPPER_ZONE_Y && this.ball.position.x < LANE_INNER ? 3 : 1;
+      const subSteps = this.ball && this.ball.position.y > 900 ? 6 : 1;
       const sub = STEP / subSteps;
       for (let s = 0; s < subSteps; s += 1) {
         this.syncFlippers(sub / 1000, input);
@@ -183,7 +183,7 @@ export class PinballGame {
     if (!this.ball || this.phase !== "plunging") return;
     const power = Math.max(0, Math.min(1, this.plunger));
     const scaled = power ** 1.6;
-    Body.setVelocity(this.ball, { x: 0, y: -4.5 - scaled * 38 });
+    Body.setVelocity(this.ball, { x: 0, y: -5 - scaled * 48 });
     Body.setPosition(this.ball, {
       x: this.table.launchSpawn.x,
       y: this.table.launchSpawn.y - 24,
@@ -480,7 +480,7 @@ export class PinballGame {
 
 function moveFlipper(flipper: FlipperDef, pressed: boolean, dt: number): void {
   const target = pressed ? flipper.upAngle : flipper.restAngle;
-  const speed = pressed ? 11 : 4;
+  const speed = pressed ? 14 : 5;
   const body = flipper.body;
   const current = body.angle;
   const diff = target - current;

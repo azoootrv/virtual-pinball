@@ -78,7 +78,7 @@ export function wallSegment(
   return Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, len, thickness, {
     isStatic: true,
     angle: Math.atan2(dy, dx),
-    restitution: 0.15,
+    restitution: 0.3,
     friction: 0,
     label,
     chamfer: { radius: 1 },
@@ -118,7 +118,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     isStatic: false,
     inertia: Infinity,
     frictionAir: 0,
-    restitution: 0.7,
+    restitution: 0.9,
     friction: 0.02,
     slop: 0.02,
     chamfer: { radius: 6 },
@@ -126,7 +126,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     collisionFilter: { category: CAT.flipper, mask: CAT.ball },
   });
   Body.setStatic(body, true);
-  body.restitution = 0.7;
+  body.restitution = 0.9;
   body.friction = 0.02;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
@@ -221,7 +221,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     const body = Bodies.rectangle(112, 538 + id * 42, 12, 28, {
       isStatic: true,
       angle: 0.12,
-      restitution: 0.55,
+      restitution: 0.75,
       friction: 0,
       label: `target:${id}`,
       collisionFilter: { category: CAT.table, mask: CAT.ball },
@@ -233,7 +233,7 @@ export function buildTable(world: Matter.Composite): TableParts {
     const body = Bodies.rectangle(508, 538 + id * 42, 12, 28, {
       isStatic: true,
       angle: -0.12,
-      restitution: 0.55,
+      restitution: 0.75,
       friction: 0,
       label: id === 0 ? "kick-target" : `target:${id + 3}`,
       collisionFilter: { category: CAT.table, mask: CAT.ball },
@@ -362,7 +362,7 @@ export function buildTable(world: Matter.Composite): TableParts {
 export function makeBall(x: number, y: number): Matter.Body {
   return Bodies.circle(x, y, BALL_R, {
     label: "ball",
-    restitution: 0.55,
+    restitution: 0.7,
     friction: 0.01,
     frictionAir: 0.0012,
     density: 0.0022,
