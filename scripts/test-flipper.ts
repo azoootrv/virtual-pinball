@@ -65,7 +65,7 @@ function simulateFlipKick(): void {
   let maxSpeed = 0;
   for (let i = 0; i < 25; i += 1) {
     const target = f.upAngle;
-    const speed = 0.85;
+    const speed = 6.5;
     const dt = 1 / 60;
     const current = f.body.angle;
     const diff = target - current;

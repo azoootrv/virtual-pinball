@@ -79,8 +79,8 @@ export function wallSegment(
   return Bodies.rectangle((x1 + x2) / 2, (y1 + y2) / 2, len, thickness, {
     isStatic: true,
     angle: Math.atan2(dy, dx),
-    restitution: 0.5,
-    friction: 0.02,
+    restitution: 0.15,
+    friction: 0,
     label,
     chamfer: { radius: 1 },
     collisionFilter: { category: CAT.table, mask: CAT.ball },
@@ -110,7 +110,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
   const width = 26;
   const pivot = side === "left" ? { x: 214, y: 962 } : { x: 416, y: 962 };
   const localPivotX = side === "left" ? -(length / 2 - 13) : length / 2 - 13;
-  const restAngle = side === "left" ? 0.42 : -0.42;
+  const restAngle = side === "left" ? 0.55 : -0.55;
   const upAngle = side === "left" ? -0.7 : 0.7;
   const cx = pivot.x - localPivotX * Math.cos(restAngle);
   const cy = pivot.y - localPivotX * Math.sin(restAngle);
@@ -120,7 +120,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
     inertia: Infinity,
     frictionAir: 0,
     restitution: 0.7,
-    friction: 0.05,
+    friction: 0.02,
     slop: 0.02,
     chamfer: { radius: 6 },
     label: `flipper:${side}`,
@@ -128,7 +128,7 @@ function makeFlipper(side: "left" | "right"): FlipperDef {
   });
   Body.setStatic(body, true);
   body.restitution = 0.7;
-  body.friction = 0.05;
+  body.friction = 0.02;
   return { body, pivot, localPivotX, restAngle, upAngle, length, width, side };
 }
 
@@ -154,16 +154,14 @@ export const LAUNCH_INNER: [number, number][] = [
 
 export const LEFT_OUTLANE: [number, number][] = [
   [LEFT, 720],
-  [90, 830],
-  [148, 930],
-  [188, 1000],
+  [92, 830],
+  [92, 1020],
 ];
 
 export const RIGHT_OUTLANE: [number, number][] = [
   [LANE_INNER, 720],
-  [528, 830],
-  [470, 930],
-  [430, 1000],
+  [526, 830],
+  [526, 1020],
 ];
 
 export const LEFT_INLANE: [number, number][] = [
@@ -174,7 +172,7 @@ export const LEFT_INLANE: [number, number][] = [
 
 export const RIGHT_INLANE: [number, number][] = [
   [468, 760],
-  [430, 900],
+  [432, 860],
   [416, 962],
 ];
 

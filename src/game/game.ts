@@ -69,6 +69,7 @@ export class PinballGame {
       gravity: { x: 0, y: 1.15, scale: 0.0012 },
       positionIterations: 16,
       velocityIterations: 12,
+      enableSleeping: false,
     });
     this.table = buildTable(this.engine.world);
     this.bindCollisions();
